@@ -12,7 +12,7 @@ const TEMPLATE: &str = r#"{
 
 const CONFIG_NONE_M: &str = "__config__ not specified\nexample:";
 const XVER_NONE_M: &str = "oldver & newver not specified\nexample:";
-const CONFIG_NONE_E: &str = "[__config__]
+const CONFIG_NONE_E: &str = "\n[__config__]
 oldver = \"oldver.json\"
 newver = \"newver.json\"";
 
@@ -50,7 +50,7 @@ pub fn load(config_table: Option<ConfigTable>) -> Option<(Verfile, Verfile)> {
         if oldver.version != 2 || newver.version != 2 {
             crate::custom_error(
                 "unsupported verfile version",
-                "please update your verfiles".to_string(),
+                "\nplease update your verfiles".to_string(),
             );
         }
 

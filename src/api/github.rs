@@ -29,7 +29,7 @@ pub async fn get_latest(repo: String) -> Release {
     match result.status() {
         StatusCode::OK => (),
         status => {
-            crate::custom_error("GET request didn't return 200", status.to_string());
+            crate::custom_error("GET request didn't return 200", format!("\n{}", status));
         }
     }
 

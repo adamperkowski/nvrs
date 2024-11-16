@@ -106,7 +106,7 @@ copies or substantial portions of the Software.",
                 }
             } else {
                 custom_error(
-                    "package not found",
+                    "package not found: ",
                     format!("{}\ndid you run `nvrs`?", package_name),
                 );
             }
@@ -156,11 +156,6 @@ copies or substantial portions of the Software.",
 }
 
 pub fn custom_error(message: &'static str, message_ext: String) {
-    let mut output = format!("! {}", message.red());
-    if !message_ext.is_empty() {
-        output.push('\n');
-        output.push_str(&message_ext);
-    }
-    println!("{}", output);
-    std::process::exit(1);
+    println!("! {}{}", message.red(), message_ext);
+    std::proccess::exit(1);
 }

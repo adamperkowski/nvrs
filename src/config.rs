@@ -59,7 +59,7 @@ pub fn load(custom_path: Option<String>) -> Config {
     if content.is_empty() {
         crate::custom_error(
             "no config found",
-            "config file locations:\n ~/.config/nvrs.toml\n ./nvrs.toml\nmake sure the file is not empty".to_string(),
+            "\nconfig file locations:\n ~/.config/nvrs.toml\n ./nvrs.toml\nmake sure the file is not empty".to_string(),
         );
     }
 
