@@ -6,36 +6,50 @@ use serde_json::Value;
 
 pub fn get_latest(package: String, args: Vec<String>, key: String) -> crate::api::ReleaseFuture {
     Box::pin(async move {
-        let url = if !args[1].is_empty() {
-            format!(
-                "https://{}/api/v4/projects/{}/releases/permalink/latest",
-                args[1],
-                args[0].replace("/", "%2F")
-            )
+        let host = if !args[1].is_empty() {
+            format!("https://{}/", args[1])
         } else {
-            format!(
-                "https://gitlab.com/api/v4/projects/{}/releases/permalink/latest",
-                args[0].replace("/", "%2F")
-            )
+            "https://gitlab.com/".to_string()
+        };
+        let prefix = format!("{}api/v4/projects/{}/", host, args[0].replace("/", "%2F"));
+
+        let url = if args[2] == "true" {
+            format!("{}{}", prefix, "tags")
+        } else {
+            format!("{}{}", prefix, "releases/permalink/latest")
         };
 
         let result = request(url, package, key).await.unwrap();
         let r_json: Value = result.json().await.unwrap();
 
-        Some(crate::api::Release {
-            tag_name: r_json
-                .get("tag_name")
+        if args[2] == "true" {
+            let name = r_json
+                .get(0)
+                .unwrap()
+                .get("name")
                 .unwrap()
                 .to_string()
-                .replace("\"", ""),
-            html_url: r_json
-                .get("_links")
-                .unwrap()
-                .get("self")
-                .unwrap()
-                .to_string()
-                .replace("\"", ""),
-        })
+                .replace("\"", "");
+            Some(crate::api::Release {
+                tag_name: name.clone(),
+                html_url: format!("{}/-/tags/{}", args[0].replace("/", "%2F"), name),
+            })
+        } else {
+            Some(crate::api::Release {
+                tag_name: r_json
+                    .get("tag_name")
+                    .unwrap()
+                    .to_string()
+                    .replace("\"", ""),
+                html_url: r_json
+                    .get("_links")
+                    .unwrap()
+                    .get("self")
+                    .unwrap()
+                    .to_string()
+                    .replace("\"", ""),
+            })
+        }
     })
 }
 

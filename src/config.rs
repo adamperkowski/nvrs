@@ -63,6 +63,7 @@ pub struct Package {
     #[serde(skip_serializing_if = "is_empty_string")]
     pub gitlab: String,
 
+    pub use_max_tag: Option<bool>,
     #[serde(default)]
     #[serde(skip_serializing_if = "is_empty_string")]
     pub prefix: String,
@@ -74,9 +75,16 @@ impl Package {
             #[cfg(feature = "aur")]
             "aur" => Some(vec![self.aur.clone()]),
             #[cfg(feature = "github")]
-            "github" => Some(vec![self.github.clone()]),
+            "github" => Some(vec![
+                self.github.clone(),
+                self.use_max_tag.unwrap_or(false).to_string(),
+            ]),
             #[cfg(feature = "gitlab")]
-            "gitlab" => Some(vec![self.gitlab.clone(), self.host.clone()]),
+            "gitlab" => Some(vec![
+                self.gitlab.clone(),
+                self.host.clone(),
+                self.use_max_tag.unwrap_or(false).to_string(),
+            ]),
             _ => None,
         }
     }

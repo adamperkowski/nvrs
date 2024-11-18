@@ -2,10 +2,16 @@ use reqwest::{
     header::{HeaderMap, HeaderValue, ACCEPT, AUTHORIZATION, USER_AGENT},
     StatusCode,
 };
+use serde_json::Value;
 
-pub fn get_latest(package: String, repo: Vec<String>, key: String) -> crate::api::ReleaseFuture {
+pub fn get_latest(package: String, args: Vec<String>, key: String) -> crate::api::ReleaseFuture {
     Box::pin(async move {
-        let url = format!("https://api.github.com/repos/{}/releases/latest", repo[0]);
+        let url = if args[1] == "true" {
+            format!("https://api.github.com/repos/{}/tags", args[0])
+        } else {
+            format!("https://api.github.com/repos/{}/releases/latest", args[0])
+        };
+
         let mut headers = HeaderMap::new();
         headers.insert(
             ACCEPT,
@@ -44,6 +50,22 @@ pub fn get_latest(package: String, repo: Vec<String>, key: String) -> crate::api
             }
         }
 
-        Some(result.json().await.unwrap())
+        if args[1] == "true" {
+            let json: Value = result.json().await.unwrap();
+            let name = json
+                .get(0)
+                .unwrap()
+                .get("name")
+                .unwrap()
+                .to_string()
+                .replace("\"", "");
+
+            Some(crate::api::Release {
+                tag_name: name.clone(),
+                html_url: format!("https://github.com/{}/releases/tag/{}", args[0], name),
+            })
+        } else {
+            Some(result.json().await.unwrap())
+        }
     })
 }
