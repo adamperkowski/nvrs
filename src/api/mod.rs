@@ -2,39 +2,54 @@ use serde::Deserialize;
 
 #[cfg(feature = "aur")]
 pub mod aur;
-#[cfg(feature = "github")]
-pub mod github;
-#[cfg(feature = "gitlab")]
-pub mod gitlab;
+//#[cfg(feature = "github")]
+//pub mod github;
+//#[cfg(feature = "gitlab")]
+//pub mod gitlab;
 
-#[derive(Deserialize)]
+// this is what `get_latest`s return
 pub struct Release {
-    pub tag_name: String,
-    pub html_url: String,
+    pub name: String,
+    pub tag: Option<String>,
+    pub url: Option<String>,
 }
 
-pub type ReleaseFuture =
-    std::pin::Pin<Box<dyn std::future::Future<Output = Option<Release>> + Send>>;
-
-pub struct Api {
-    pub name: &'static str,
-    pub func: fn(String, Vec<String>, String) -> ReleaseFuture,
+pub struct ApiArgs {
+    pub request_client: reqwest::Client,
+    pub package: String,
+    pub target: String, // equivalent to ex. `github = "adamperkowski/nvrs"` in the config
+    pub host: Option<String>,
+    pub api_key: Option<String>,
 }
 
-pub const API_LIST: &[Api] = &[
-    #[cfg(feature = "aur")]
-    Api {
-        name: "aur",
-        func: aur::get_latest,
-    },
-    #[cfg(feature = "github")]
-    Api {
-        name: "github",
-        func: github::get_latest,
-    },
-    #[cfg(feature = "gitlab")]
-    Api {
-        name: "gitlab",
-        func: gitlab::get_latest,
-    },
-];
+// this is necessary because we need to store a reference to an async function in Source
+type ReleaseFuture = std::pin::Pin<Box<dyn std::future::Future<Output = Option<Release>> + Send>>;
+
+// TODO: consider not using ReleaseFuture & Source. just calling by name
+
+#[cfg(feature = "http")]
+pub fn setup_headers() -> reqwest::header::HeaderMap {
+    use reqwest::header::{HeaderMap, HeaderValue, USER_AGENT};
+
+    let mut headers = HeaderMap::new();
+    headers.insert(USER_AGENT, HeaderValue::from_static("nvrs"));
+
+    headers
+}
+
+#[cfg(feature = "http")]
+pub fn match_statuscode(status: reqwest::StatusCode, package: String) {
+    use reqwest::StatusCode;
+
+    use crate::error;
+
+    match status {
+        StatusCode::OK => (),
+        StatusCode::FORBIDDEN => error::custom_error(
+            "request returned 430: ",
+            format!("{}\nwe might be getting rate-limited here", package),
+            None,
+        ),
+        _ => error::custom_error("request didn't return 200", format!("\n{}", status), None),
+    }
+}

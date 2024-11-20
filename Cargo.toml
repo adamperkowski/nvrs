@@ -10,6 +10,7 @@ categories = ["command-line-interface", "command-line-utilities"]
 edition = "2021"
 include = [
     "**/*.rs",
+    "src/**/*",
     "Cargo.toml",
     "README.md",
     "LICENSE",
@@ -19,10 +20,11 @@ include = [
 ]
 
 [features]
-default = ["aur", "github", "gitlab"]
-aur = ["reqwest"]
-github = ["reqwest"]
-gitlab = ["reqwest"]
+default = ["http", "aur", "github", "gitlab"]
+http = ["reqwest"]
+aur = ["http"]
+github = ["http"]
+gitlab = ["http"]
 
 [dependencies]
 clap = { version = "4.5.21", features = ["derive", "color", "error-context", "help", "std", "usage"], default-features = false }
@@ -32,6 +34,7 @@ lazy_static = "1.5.0"
 reqwest = { version = "0.12.9", features = ["__tls", "charset", "default-tls", "h2", "http2", "json"], default-features = false, optional = true }
 serde = { version = "1.0.215", features = ["derive"] }
 serde_json = "1.0.132"
+thiserror = "2.0.3"
 tokio = { version = "1.41.1", features = ["full"] }
 toml = { version = "0.8.19", features = ["parse", "display"], default-features = false }
 
