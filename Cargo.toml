@@ -41,3 +41,22 @@ codegen-units = 1
 panic = "abort"
 strip = true
 opt-level = "z"
+
+[dev-dependencies]
+criterion = { version = "0.5", features = ["html_reports"] }
+
+[[bench]]
+name = "nvrs_bench"
+harness = false
+
+[lib]
+name = "nvrs"
+path = "src/lib.rs"
+
+[[bin]]
+name = "nvrs"
+path = "src/main.rs"
+
+[profile.bench]
+opt-level = 3
+debug = false
