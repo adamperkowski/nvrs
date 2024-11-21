@@ -7,21 +7,35 @@ pub enum Error {
     #[error("request error: {0}")]
     RequestError(#[from] reqwest::Error),
 
-    #[error("io error: `{0}`")]
+    #[error("io error: {0}")]
     IOError(#[from] std::io::Error),
+
+    #[error("json parsing error: {0}")]
+    JSONError(#[from] serde_json::Error),
+
+    // custom errors
+    #[error("request didn't return 200")]
+    RequestNotOK,
+
+    #[error("request returned 430\nwe might be getting rate-limited here")]
+    RequestForbidden,
+
+    #[error("version not found")]
+    NoVersion,
 }
 
 pub type Result<T> = std::result::Result<T, Error>;
 
-pub fn print_error(error: Error, force: Option<bool>) {
+/*pub fn print_error(error: Error, force: Option<bool>) {
     let error = error.to_string();
-    let (error_t, error_m) = error.split_once(':').unwrap();
-    custom_error(error_t, format!("\n{}", error_m), force);
-}
+    let err = error.split_once(':').unwrap_or_default();
+    custom_error(err.0, format!("\n{}", err.1), force);
+}*/
 
-pub fn custom_error(title: &'static str, message: String, force: Option<bool>) {
+pub fn custom_error(title: &'static str, message: String, exit: bool, force: bool) {
     println!("! {}{}", title.red(), message.replace("\n", "\n  "));
-    if force.is_some_and(move |_| false) {
+
+    if exit {
         std::process::exit(1);
     }
 }

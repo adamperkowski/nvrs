@@ -4,14 +4,14 @@ use nvrs::*;
 async fn main() {
     let args = api::ApiArgs {
         request_client: reqwest::Client::new(),
-        package: "".to_string(),
+        package: "tukai".to_string(),
         target: "".to_string(),
         host: None,
         api_key: None,
     };
     let r = api::aur::get_latest(args).await;
     match r {
-        Ok(_) => (),
-        Err(e) => error::custom_error("request failed", format!("\n{}", e), None),
+        Ok(_) => println!("{:#?}", r.ok()),
+        Err(e) => eprintln!("FIXME error displaying\npackage here or something\n{}", e),
     }
 }

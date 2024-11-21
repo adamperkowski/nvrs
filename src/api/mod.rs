@@ -1,5 +1,3 @@
-use serde::Deserialize;
-
 #[cfg(feature = "aur")]
 pub mod aur;
 //#[cfg(feature = "github")]
@@ -8,6 +6,7 @@ pub mod aur;
 //pub mod gitlab;
 
 // this is what `get_latest`s return
+#[derive(Debug)]
 pub struct Release {
     pub name: String,
     pub tag: Option<String>,
@@ -38,18 +37,15 @@ pub fn setup_headers() -> reqwest::header::HeaderMap {
 }
 
 #[cfg(feature = "http")]
-pub fn match_statuscode(status: reqwest::StatusCode, package: String) {
+pub fn match_statuscode(req: &reqwest::Response) -> crate::error::Result<()> {
+    use crate::error;
     use reqwest::StatusCode;
 
-    use crate::error;
+    let status = req.status();
 
     match status {
-        StatusCode::OK => (),
-        StatusCode::FORBIDDEN => error::custom_error(
-            "request returned 430: ",
-            format!("{}\nwe might be getting rate-limited here", package),
-            None,
-        ),
-        _ => error::custom_error("request didn't return 200", format!("\n{}", status), None),
+        StatusCode::OK => Ok(()),
+        StatusCode::FORBIDDEN => Err(error::Error::RequestForbidden),
+        _ => Err(error::Error::RequestNotOK),
     }
 }
