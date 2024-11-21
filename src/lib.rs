@@ -6,8 +6,11 @@ pub mod error;
 // communication with sources
 pub mod api;
 
+// command-line arguments
+pub mod cli;
+
 // operations on configuration files
-// pub mod config;
+pub mod config;
 
 // operations on version files
 // pub mod verfiles;

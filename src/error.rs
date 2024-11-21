@@ -13,6 +13,9 @@ pub enum Error {
     #[error("json parsing error: {0}")]
     JSONError(#[from] serde_json::Error),
 
+    #[error("toml parsing error: {0}")]
+    TOMLError(#[from] toml::de::Error),
+
     // custom errors
     #[error("request didn't return 200")]
     RequestNotOK,
@@ -22,6 +25,12 @@ pub enum Error {
 
     #[error("version not found")]
     NoVersion,
+
+    #[error("specified config file not found")]
+    NoConfigSpecified,
+
+    #[error("no config found\nconfig file locations:\n ~/.config/nvrs.toml\n ./nvrs.toml\nmake sure the file is not empty")]
+    NoConfig,
 }
 
 pub type Result<T> = std::result::Result<T, Error>;

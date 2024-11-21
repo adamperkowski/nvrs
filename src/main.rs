@@ -2,6 +2,8 @@ use nvrs::*;
 
 #[tokio::main]
 async fn main() {
+    let cli = cli::get_args();
+
     let args = api::ApiArgs {
         request_client: reqwest::Client::new(),
         package: "tukai".to_string(),
