@@ -27,7 +27,7 @@ pub struct VerPackage {
 // main data structure
 #[derive(Serialize, Deserialize)]
 pub struct VerData {
-    pub packages: BTreeMap<String, VerPackage>,
+    pub data: BTreeMap<String, VerPackage>,
 }
 
 // file structure
