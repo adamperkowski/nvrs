@@ -86,3 +86,5 @@ async fn load_file(path: &Path) -> error::Result<Verfile> {
 
     Ok(serde_json::from_str(&content)?)
 }
+
+// TODO: tests
