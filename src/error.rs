@@ -50,6 +50,9 @@ pub enum Error {
 
     #[error("unsupported verfile version\nplease update your verfiles")]
     VerfileVer,
+
+    #[error("package not in newver")]
+    PkgNotInNewver,
 }
 
 pub type Result<T> = std::result::Result<T, Error>;

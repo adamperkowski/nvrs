@@ -7,6 +7,8 @@ async fn main() -> error::Result<()> {
 
     if core.cli.cmp {
         compare(core).await;
+    } else if core.cli.take.is_some() {
+        take(core).await?
     }
 
     let args = api::ApiArgs {
@@ -40,7 +42,6 @@ async fn init() -> error::Result<Core> {
 }
 
 async fn compare(core: Core) {
-    let config = core.config;
     let (oldver, newver) = core.verfiles;
 
     for new_pkg in newver.data.data {
@@ -62,4 +63,47 @@ async fn compare(core: Core) {
             );
         }
     }
+}
+
+async fn take(core: Core) -> error::Result<()> {
+    let names = core.cli.take.unwrap();
+    let config = core.config;
+    let (mut oldver, newver) = core.verfiles;
+
+    for package_name in names {
+        if let Some(new_pkg) = newver.data.data.iter().find(|p| p.0 == &package_name) {
+            if let Some(old_pkg) = oldver.data.data.iter_mut().find(|p| p.0 == &package_name) {
+                if old_pkg.1.version != new_pkg.1.version {
+                    println!(
+                        "+ {} {} -> {}",
+                        package_name.blue(),
+                        old_pkg.1.version.red(),
+                        new_pkg.1.version.green()
+                    );
+                } else {
+                    println!(
+                        "+ {} {} -> {}",
+                        package_name.blue(),
+                        old_pkg.1.version.red(),
+                        new_pkg.1.version.green()
+                    );
+                }
+                old_pkg.1.version = new_pkg.1.version.clone();
+                old_pkg.1.gitref = new_pkg.1.gitref.clone();
+                old_pkg.1.url = new_pkg.1.url.clone();
+            } else {
+                println!(
+                    "+ {} {} -> {}",
+                    package_name.blue(),
+                    "NONE".red(),
+                    new_pkg.1.version.green()
+                );
+                oldver.data.data.insert(package_name, new_pkg.1.clone());
+            }
+        } else {
+            return Err(error::Error::PkgNotInNewver);
+        }
+    }
+
+    Ok(verfiles::save(oldver, true, config.__config__).await?)
 }

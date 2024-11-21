@@ -15,7 +15,7 @@ const TEMPLATE: &str = r#"{
 "#;
 
 // package entry structure
-#[derive(Serialize, Deserialize)]
+#[derive(Clone, Serialize, Deserialize)]
 pub struct VerPackage {
     pub version: String,
     #[serde(default)]
