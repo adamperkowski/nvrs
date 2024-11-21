@@ -1,6 +1,9 @@
 # nvrs
 # https://github.com/adamperkowski/nvrs
 
+# this is an example configuration file for nvrs
+# use `use_latest_release = true` for maximum nvchecker compatibility
+
 [__config__]
 oldver = "oldver.json"
 newver = "newver.json"

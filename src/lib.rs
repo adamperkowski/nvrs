@@ -13,4 +13,11 @@ pub mod cli;
 pub mod config;
 
 // operations on version files
-// pub mod verfiles;
+pub mod verfiles;
+
+// example "core" vars structure
+pub struct Core {
+    pub cli: cli::Cli,
+    pub config: config::Config,
+    pub verfiles: (verfiles::Verfile, verfiles::Verfile),
+}

@@ -11,7 +11,7 @@ furnished to do so, subject to the following conditions:\n
 The above copyright notice and this permission notice shall be included in all
 copies or substantial portions of the Software.";
 
-#[derive(Parser)]
+#[derive(Clone, Parser)]
 #[command(version, about)]
 pub struct Cli {
     #[arg(
@@ -19,7 +19,7 @@ pub struct Cli {
         long,
         help = "Compare newver with oldver and display differences as updates"
     )]
-    cmp: bool,
+    pub cmp: bool,
 
     #[arg(
         short = 't',
@@ -28,7 +28,7 @@ pub struct Cli {
         help = "List of packages to update automatically, separated by a comma",
         value_delimiter = ','
     )]
-    take: Option<Vec<String>>,
+    pub take: Option<Vec<String>>,
 
     #[arg(
         short = 'n',
@@ -37,14 +37,14 @@ pub struct Cli {
         help = "List of packages to delete from the config",
         value_delimiter = ','
     )]
-    nuke: Option<Vec<String>>,
+    pub nuke: Option<Vec<String>>,
 
     #[arg(
         long = "config",
         value_name = "path",
         help = "Override path to the config file"
     )]
-    custom_config: Option<String>,
+    pub custom_config: Option<String>,
 
     #[arg(long, help = "Don't exit the program on recoverable errors")]
     no_fail: bool,
@@ -72,3 +72,5 @@ pub fn get_args() -> Cli {
 
     cli
 }
+
+// TODO: tests

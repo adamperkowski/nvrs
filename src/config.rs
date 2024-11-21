@@ -26,15 +26,15 @@ struct Keyfile {
 
 // main config file
 // __config__ structure
-#[derive(Clone, Deserialize, Serialize)]
-struct ConfigTable {
-    oldver: Option<String>, // TODO: exceptions for empty oldver & newver entries
-    newver: Option<String>,
+#[derive(Debug, Clone, Deserialize, Serialize)]
+pub struct ConfigTable {
+    pub oldver: Option<String>, // TODO: exceptions for empty oldver & newver entries
+    pub newver: Option<String>,
     keyfile: Option<String>,
 }
 
 // package entry structure
-#[derive(Clone, Deserialize, Serialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 struct Package {
     source: String, // ex. "github", "aur"
     #[serde(default)]
@@ -60,9 +60,9 @@ struct Package {
     prefix: String,
 }
 
-#[derive(Clone, Deserialize, Serialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct Config {
-    __config__: Option<ConfigTable>,
+    pub __config__: Option<ConfigTable>,
     #[serde(flatten)]
     packages: BTreeMap<String, Package>,
 }
@@ -126,3 +126,5 @@ pub async fn load(
 fn is_empty_string(s: &str) -> bool {
     s.is_empty()
 }
+
+// TODO: tests

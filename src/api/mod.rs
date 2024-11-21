@@ -49,3 +49,5 @@ pub fn match_statuscode(req: &reqwest::Response) -> crate::error::Result<()> {
         _ => Err(error::Error::RequestNotOK),
     }
 }
+
+// TODO: tests
