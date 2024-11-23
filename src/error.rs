@@ -53,6 +53,9 @@ pub enum Error {
 
     #[error("package not in newver")]
     PkgNotInNewver,
+
+    #[error("source not found")]
+    SourceNotFound,
 }
 
 pub type Result<T> = std::result::Result<T, Error>;

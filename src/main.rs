@@ -1,3 +1,4 @@
+use api::Release;
 use colored::Colorize;
 use nvrs::*;
 
@@ -8,21 +9,10 @@ async fn main() -> error::Result<()> {
     if core.cli.cmp {
         compare(core).await;
     } else if core.cli.take.is_some() {
-        take(core).await?
+        take(core).await?;
+    } else {
+        sync(core).await?;
     }
-
-    let args = api::ApiArgs {
-        request_client: reqwest::Client::new(),
-        package: "tukai".to_string(),
-        target: "".to_string(),
-        host: None,
-        api_key: None,
-    };
-    let r = api::aur::get_latest(args).await;
-    match r {
-        Ok(_) => println!("{:#?}", r.ok()),
-        Err(e) => eprintln!("FIXME error displaying\npackage here or something\n{}", e),
-    };
 
     Ok(())
 }
@@ -38,6 +28,7 @@ async fn init() -> error::Result<Core> {
         cli,
         config: config.0,
         verfiles,
+        client: reqwest::Client::new(),
     })
 }
 
@@ -106,4 +97,63 @@ async fn take(core: Core) -> error::Result<()> {
     }
 
     Ok(verfiles::save(oldver, true, config.__config__).await?)
+}
+
+async fn sync(core: Core) -> error::Result<()> {
+    let config = core.config;
+    let (_, mut newver) = core.verfiles;
+
+    let tasks: Vec<_> = config
+        .packages
+        .clone()
+        .into_iter()
+        .map(|pkg| tokio::spawn(run_source(pkg, core.client.clone())))
+        .collect();
+
+    let mut results = futures::future::join_all(tasks).await;
+
+    for package in config.packages {
+        let release = results.remove(0).unwrap()?;
+
+        if let Some(new_pkg) = newver.data.data.iter_mut().find(|p| p.0 == &package.0) {
+            let gitref :String;
+            let tag = if let Some(t) = release.tag.clone() {
+                gitref = format!("refs/tags/{}", t);
+                release.tag.unwrap().replacen(&package.1.prefix, "", 1)
+            } else {
+                gitref = String::new();
+                release.name
+            };
+
+            if new_pkg.1.version != tag {
+                println!(
+                    "| {} {} -> {}",
+                    package.0.blue(),
+                    new_pkg.1.version.red(),
+                    tag.green()
+                );
+                new_pkg.1.version = tag.clone();
+                new_pkg.1.gitref = gitref;
+                new_pkg.1.url = release.url;
+            }
+        } else {
+            let gitref :String;
+            let tag = if let Some(t) = release.tag.clone() {
+                gitref = format!("refs/tags/{}", t);
+                release.tag.unwrap().replacen(&package.1.prefix, "", 1)
+            } else {
+                gitref = String::new();
+                release.name
+            };
+
+            println!("| {} {} -> {}", package.0.blue(), "NONE".red(), tag.green());
+            newver.data.data.insert(package.0, verfiles::VerPackage {
+            version: tag.clone(),
+            gitref,
+            url: release.url});
+        }
+    }
+
+    verfiles::save(newver, false, config.__config__).await?;
+    Ok(())
 }

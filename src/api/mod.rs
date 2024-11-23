@@ -10,19 +10,26 @@ pub mod aur;
 pub struct Release {
     pub name: String,
     pub tag: Option<String>,
-    pub url: Option<String>,
+    pub url: String,
 }
 
 pub struct ApiArgs {
     pub request_client: reqwest::Client,
     pub package: String,
-    pub target: String, // equivalent to ex. `github = "adamperkowski/nvrs"` in the config
-    pub host: Option<String>,
+    //pub target: String, // equivalent to ex. `github = "adamperkowski/nvrs"` in the config
+    //pub host: Option<String>,
+    pub args: Option<Vec<String>>,
     pub api_key: Option<String>,
 }
 
-// this is necessary because we need to store a reference to an async function in Source
-type ReleaseFuture = std::pin::Pin<Box<dyn std::future::Future<Output = Option<Release>> + Send>>;
+// this is necessary because we need to store a reference to an async function in `Api`
+type ReleaseFuture =
+    std::pin::Pin<Box<dyn std::future::Future<Output = crate::error::Result<Release>> + Send>>;
+
+pub struct Api {
+    pub name: &'static str,
+    pub func: fn(ApiArgs) -> ReleaseFuture,
+}
 
 // TODO: consider not using ReleaseFuture & Source. just calling by name
 
@@ -49,5 +56,13 @@ pub fn match_statuscode(req: &reqwest::Response) -> crate::error::Result<()> {
         _ => Err(error::Error::RequestNotOK),
     }
 }
+
+pub const API_LIST: &[Api] = &[
+    #[cfg(feature = "aur")]
+    Api {
+        name: "aur",
+        func: aur::get_latest,
+    },
+];
 
 // TODO: tests

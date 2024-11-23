@@ -9,16 +9,16 @@ oldver = "oldver.json"
 newver = "newver.json"
 keyfile = "n_keyfile.toml"
 
-[hyprgui]
-source = "github"
-github = "hyprutils/hyprgui"
-prefix = "v"
+#[hyprgui]
+#source = "github"
+#github = "hyprutils/hyprgui"
+#prefix = "v"
 
-[mkinitcpio]
-source = "gitlab"
-host = "gitlab.archlinux.org"
-gitlab = "archlinux/mkinitcpio/mkinitcpio"
-prefix = "v"
+#[mkinitcpio]
+#source = "gitlab"
+#host = "gitlab.archlinux.org"
+#gitlab = "archlinux/mkinitcpio/mkinitcpio"
+#prefix = "v"
 
 [hyprwall]
 source = "aur"

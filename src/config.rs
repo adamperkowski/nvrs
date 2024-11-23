@@ -1,4 +1,4 @@
-use crate::error;
+use crate::{api::ApiArgs, error};
 use serde::{Deserialize, Serialize};
 use std::{
     collections::BTreeMap,
@@ -35,7 +35,7 @@ pub struct ConfigTable {
 
 // package entry structure
 #[derive(Debug, Clone, Deserialize, Serialize)]
-struct Package {
+pub struct Package {
     source: String, // ex. "github", "aur"
     #[serde(default)]
     #[serde(skip_serializing_if = "is_empty_string")]
@@ -57,14 +57,31 @@ struct Package {
 
     #[serde(default)]
     #[serde(skip_serializing_if = "is_empty_string")]
-    prefix: String,
+    pub prefix: String,
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct Config {
     pub __config__: Option<ConfigTable>,
     #[serde(flatten)]
-    packages: BTreeMap<String, Package>,
+    pub packages: BTreeMap<String, Package>,
+}
+
+impl Package {
+    // global function to pass API agrs
+    pub fn get_api(&self) -> (String, Option<Vec<String>>) {
+        let args = match self.source.as_str() {
+            #[cfg(feature = "aur")]
+            "aur" => Some(vec![self.aur.clone()]),
+            #[cfg(feature = "github")]
+            "github" => Some(vec![self.github.clone()]),
+            #[cfg(feature = "gitlab")]
+            "gitlab" => Some(vec![self.gitlab.clone(), self.host.clone()]),
+            _ => None,
+        };
+
+        (self.source.clone(), args)
+    }
 }
 
 pub async fn load(
