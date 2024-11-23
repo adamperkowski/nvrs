@@ -26,12 +26,9 @@ pub fn get_latest(package: String, _: Vec<String>, _: String) -> crate::api::Rel
         Some(crate::api::Release {
             tag_name: first_result
                 .get("Version")
-                .unwrap()
-                .to_string()
-                .split('-')
-                .next()
+                .and_then(|v| v.as_str())
+                .and_then(|s| s.split('-').next())
                 .unwrap_or("")
-                .replace("\"", "")
                 .to_string(),
             html_url: first_result
                 .get("URL")

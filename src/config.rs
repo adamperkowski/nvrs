@@ -101,7 +101,7 @@ pub fn load(custom_path: Option<String>) -> (Config, PathBuf, Option<Keyfile>) {
             return (
                 toml_content.clone(),
                 PathBuf::from(config_path),
-                load_keyfile(toml_content),
+                load_keyfile(&toml_content),
             );
         } else {
             crate::custom_error("specified config file not found", String::new(), "");
@@ -143,17 +143,14 @@ pub fn load(custom_path: Option<String>) -> (Config, PathBuf, Option<Keyfile>) {
 
     let toml_content: Config = toml::from_str(&content).expect("error reading the config file");
 
-    (
-        toml_content.clone(),
-        path_actual,
-        load_keyfile(toml_content),
-    )
+    let keyfile = load_keyfile(&toml_content);
+    (toml_content, path_actual, keyfile)
 }
 
-fn load_keyfile(toml_content: Config) -> Option<Keyfile> {
-    if let Some(config_content) = toml_content.__config__ {
-        if let Some(keyfile) = config_content.keyfile {
-            let keyfile_path = Path::new(&keyfile);
+fn load_keyfile(toml_content: &Config) -> Option<Keyfile> {
+    if let Some(ref config_content) = toml_content.__config__ {
+        if let Some(ref keyfile) = config_content.keyfile {
+            let keyfile_path = Path::new(keyfile);
             let keyfile_content = if keyfile_path.exists() && keyfile_path.is_file() {
                 fs::read_to_string(keyfile_path).unwrap_or_default()
             } else {

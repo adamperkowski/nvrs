@@ -210,7 +210,7 @@ copies or substantial portions of the Software.",
     }
 }
 
-async fn run_source(
+pub async fn run_source(
     package: (String, config::Package),
     keyfile: Option<Keyfile>,
 ) -> Option<api::Release> {
