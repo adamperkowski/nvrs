@@ -11,4 +11,4 @@ updates:
     labels:
       - "deps"
     commit-message:
-      prefix: "cargo"
+      prefix: "chore(deps.cargo)"

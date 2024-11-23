@@ -2,6 +2,23 @@
 
 All notable changes to nvrs will be documented in this file.
 
+## [upstream]
+
+### 🐛 Bug Fixes
+
+- (*verfile*) allow missing gitref & url ([b93216d](https://github.com/adamperkowski/nvrs/commit/b93216d5146a672897e11938668e05cfa859cfac))
+
+### 📚 Documentation
+
+- (*git-cliff*) add `UI/UX` ([42727ad](https://github.com/adamperkowski/nvrs/commit/42727ad6bd020ecee06e93017e7e5b68851c01d3))
+- (*config*) fix the package name (alpm -> mkinitcpio) ([1327516](https://github.com/adamperkowski/nvrs/commit/132751692941f5e1e2cce188d545f3ee421dad46))
+- better banner ([a4718b6](https://github.com/adamperkowski/nvrs/commit/a4718b60505d26c2e262b70d77160b475b8f2348))
+- (*dependabot*) change cargo commit message ([90d50ab](https://github.com/adamperkowski/nvrs/commit/90d50ab0fd6cd4964408796e2f75affeb539923b))
+
+### 🧩 UI/UX
+
+- (*output*) print out `NONE` take information ([71cb36f](https://github.com/adamperkowski/nvrs/commit/71cb36f913035d484bf26d8a2c3430132ea176ba))
+
 ## [0.1.3] - 2024-11-18
 
 ### 🐛 Bug Fixes

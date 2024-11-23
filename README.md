@@ -1,7 +1,7 @@
 <div align='center'>
 
 # nvrs
-new version checker for software releases 🦀<br>
+🚦 fast new version checker for software releases 🦀<br>
 [nvchecker](https://github.com/lilydjwg/nvchecker) rewritten in Rust
 
 ![GitHub Contributors](https://img.shields.io/github/contributors-anon/adamperkowski/nvrs?style=for-the-badge&labelColor=%23a8127d&color=%23336795) ![GitHub Repo Size](https://img.shields.io/github/repo-size/adamperkowski/nvrs?style=for-the-badge&labelColor=%23a8127d&color=%23336795) ![Repo Created At](https://img.shields.io/github/created-at/adamperkowski/nvrs?style=for-the-badge&labelColor=%23a8127d&color=%23336795)
