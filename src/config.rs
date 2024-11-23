@@ -1,4 +1,4 @@
-use crate::{api::ApiArgs, error};
+use crate::error;
 use serde::{Deserialize, Serialize};
 use std::{
     collections::BTreeMap,

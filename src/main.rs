@@ -1,4 +1,3 @@
-use api::Release;
 use colored::Colorize;
 use nvrs::*;
 
@@ -71,17 +70,10 @@ async fn take(core: Core) -> error::Result<()> {
                         old_pkg.1.version.red(),
                         new_pkg.1.version.green()
                     );
-                } else {
-                    println!(
-                        "+ {} {} -> {}",
-                        package_name.blue(),
-                        old_pkg.1.version.red(),
-                        new_pkg.1.version.green()
-                    );
+                    old_pkg.1.version = new_pkg.1.version.clone();
+                    old_pkg.1.gitref = new_pkg.1.gitref.clone();
+                    old_pkg.1.url = new_pkg.1.url.clone();
                 }
-                old_pkg.1.version = new_pkg.1.version.clone();
-                old_pkg.1.gitref = new_pkg.1.gitref.clone();
-                old_pkg.1.url = new_pkg.1.url.clone();
             } else {
                 println!(
                     "+ {} {} -> {}",
@@ -96,7 +88,7 @@ async fn take(core: Core) -> error::Result<()> {
         }
     }
 
-    Ok(verfiles::save(oldver, true, config.__config__).await?)
+    verfiles::save(oldver, true, config.__config__).await
 }
 
 async fn sync(core: Core) -> error::Result<()> {
@@ -116,7 +108,7 @@ async fn sync(core: Core) -> error::Result<()> {
         let release = results.remove(0).unwrap()?;
 
         if let Some(new_pkg) = newver.data.data.iter_mut().find(|p| p.0 == &package.0) {
-            let gitref :String;
+            let gitref: String;
             let tag = if let Some(t) = release.tag.clone() {
                 gitref = format!("refs/tags/{}", t);
                 release.tag.unwrap().replacen(&package.1.prefix, "", 1)
@@ -137,7 +129,7 @@ async fn sync(core: Core) -> error::Result<()> {
                 new_pkg.1.url = release.url;
             }
         } else {
-            let gitref :String;
+            let gitref: String;
             let tag = if let Some(t) = release.tag.clone() {
                 gitref = format!("refs/tags/{}", t);
                 release.tag.unwrap().replacen(&package.1.prefix, "", 1)
@@ -147,13 +139,16 @@ async fn sync(core: Core) -> error::Result<()> {
             };
 
             println!("| {} {} -> {}", package.0.blue(), "NONE".red(), tag.green());
-            newver.data.data.insert(package.0, verfiles::VerPackage {
-            version: tag.clone(),
-            gitref,
-            url: release.url});
+            newver.data.data.insert(
+                package.0,
+                verfiles::VerPackage {
+                    version: tag.clone(),
+                    gitref,
+                    url: release.url,
+                },
+            );
         }
     }
 
-    verfiles::save(newver, false, config.__config__).await?;
-    Ok(())
+    verfiles::save(newver, false, config.__config__).await
 }

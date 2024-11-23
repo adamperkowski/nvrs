@@ -60,13 +60,8 @@ pub enum Error {
 
 pub type Result<T> = std::result::Result<T, Error>;
 
-/*pub fn print_error(error: Error, force: Option<bool>) {
-    let error = error.to_string();
-    let err = error.split_once(':').unwrap_or_default();
-    custom_error(err.0, format!("\n{}", err.1), force);
-}*/
-
-pub fn custom_error(title: &'static str, message: String, exit: bool, force: bool) {
+// TODO: force
+pub fn custom_error(title: &'static str, message: String, exit: bool /*, force: bool*/) {
     println!("! {}{}", title.red(), message.replace("\n", "\n  "));
 
     if exit {

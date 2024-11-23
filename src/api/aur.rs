@@ -18,7 +18,7 @@ pub fn get_latest(args: api::ApiArgs) -> api::ReleaseFuture {
 
         let result = client.get(url).headers(api::setup_headers()).send().await?;
 
-        api::match_statuscode(&result); // FIXME
+        api::match_statuscode(&result)?;
 
         let json: AURResponse = result.json().await?;
 

@@ -46,7 +46,10 @@ pub struct Cli {
     )]
     pub custom_config: Option<String>,
 
-    #[arg(long, help = "Don't exit the program on recoverable errors")]
+    #[arg(
+        long,
+        help = "Don't exit the program on recoverable errors (does nothing as of now)"
+    )]
     no_fail: bool,
 
     #[arg(long, help = "Display copyright information")]
