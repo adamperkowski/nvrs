@@ -13,7 +13,7 @@ struct AURResult {
 
 pub fn get_latest(args: api::ApiArgs) -> api::ReleaseFuture {
     Box::pin(async move {
-        let url = format!("https://aur.archlinux.org/rpc/v5/info/{}", args.package);
+        let url = format!("https://aur.archlinux.org/rpc/v5/info/{}", args.args[0]);
         let client = args.request_client;
 
         let result = client.get(url).headers(api::setup_headers()).send().await?;

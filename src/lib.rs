@@ -28,6 +28,7 @@ pub async fn run_source(
     client: reqwest::Client,
 ) -> error::Result<api::Release> {
     let (source, api_args) = package.1.get_api();
+
     if let Some(api) = api::API_LIST.iter().find(|a| a.name == source) {
         let args = api::ApiArgs {
             request_client: client,

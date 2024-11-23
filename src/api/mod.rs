@@ -1,9 +1,9 @@
 #[cfg(feature = "aur")]
-pub mod aur;
-//#[cfg(feature = "github")]
-//pub mod github;
+mod aur;
+#[cfg(feature = "github")]
+mod github;
 //#[cfg(feature = "gitlab")]
-//pub mod gitlab;
+//mod gitlab;
 
 // this is what `get_latest`s return
 #[derive(Debug)]
@@ -18,7 +18,7 @@ pub struct ApiArgs {
     pub package: String,
     //pub target: String, // equivalent to ex. `github = "adamperkowski/nvrs"` in the config
     //pub host: Option<String>,
-    pub args: Option<Vec<String>>,
+    pub args: Vec<String>,
     pub api_key: Option<String>,
 }
 
@@ -62,6 +62,11 @@ pub const API_LIST: &[Api] = &[
     Api {
         name: "aur",
         func: aur::get_latest,
+    },
+    #[cfg(feature = "github")]
+    Api {
+        name: "github",
+        func: github::get_latest,
     },
 ];
 

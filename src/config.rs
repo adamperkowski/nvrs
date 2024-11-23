@@ -69,15 +69,15 @@ pub struct Config {
 
 impl Package {
     // global function to pass API agrs
-    pub fn get_api(&self) -> (String, Option<Vec<String>>) {
+    pub fn get_api(&self) -> (String, Vec<String>) {
         let args = match self.source.as_str() {
             #[cfg(feature = "aur")]
-            "aur" => Some(vec![self.aur.clone()]),
+            "aur" => vec![self.aur.clone()],
             #[cfg(feature = "github")]
-            "github" => Some(vec![self.github.clone()]),
+            "github" => vec![self.github.clone()],
             #[cfg(feature = "gitlab")]
-            "gitlab" => Some(vec![self.gitlab.clone(), self.host.clone()]),
-            _ => None,
+            "gitlab" => vec![self.gitlab.clone(), self.host.clone()],
+            _ => vec![],
         };
 
         (self.source.clone(), args)
