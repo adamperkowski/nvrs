@@ -2,8 +2,8 @@
 mod aur;
 #[cfg(feature = "github")]
 mod github;
-//#[cfg(feature = "gitlab")]
-//mod gitlab;
+#[cfg(feature = "gitlab")]
+mod gitlab;
 
 // this is what `get_latest`s return
 #[derive(Debug)]
@@ -53,6 +53,7 @@ pub fn match_statuscode(req: &reqwest::Response) -> crate::error::Result<()> {
     match status {
         StatusCode::OK => Ok(()),
         StatusCode::FORBIDDEN => Err(error::Error::RequestForbidden),
+        StatusCode::NOT_FOUND => Err(error::Error::RequestNotFound),
         _ => Err(error::Error::RequestNotOK),
     }
 }
@@ -67,6 +68,11 @@ pub const API_LIST: &[Api] = &[
     Api {
         name: "github",
         func: github::get_latest,
+    },
+    #[cfg(feature = "gitlab")]
+    Api {
+        name: "gitlab",
+        func: gitlab::get_latest,
     },
 ];
 

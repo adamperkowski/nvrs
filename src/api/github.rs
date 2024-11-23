@@ -23,14 +23,13 @@ pub fn get_latest(args: api::ApiArgs) -> api::ReleaseFuture {
             "X-GitHub-Api-Version",
             HeaderValue::from_static("2022-11-28"),
         );
-        if args.api_key.is_some() {
-            let bearer = format!("Bearer {}", args.api_key.unwrap());
+        if let Some(key) = args.api_key {
+            let bearer = format!("Bearer {}", key);
             headers.insert(AUTHORIZATION, HeaderValue::from_str(&bearer).unwrap());
         }
         let client = args.request_client;
 
         let result = client.get(url).headers(headers).send().await?;
-
         api::match_statuscode(&result)?;
 
         let json: GitHubResponse = result.json().await?;

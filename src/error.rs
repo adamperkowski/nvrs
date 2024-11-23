@@ -33,6 +33,9 @@ pub enum Error {
     #[error("request returned 430\n{RATE_LIMIT}")]
     RequestForbidden,
 
+    #[error("request returned 404 not found")]
+    RequestNotFound,
+
     #[error("version not found")]
     NoVersion,
 
