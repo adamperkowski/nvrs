@@ -23,7 +23,7 @@ you may encounter some issues. please consider [submitting feedback](https://git
 
 | command       | time per **updated** package | details                                                |
 |---------------|------------------------------|--------------------------------------------------------|
-| `nvrs`        | ~ 0.04s                      | **API requests included**<br>depends on internet speed |
+| `nvrs`        | ~ 0.03s                      | **API requests included**<br>depends on internet speed |
 | `nvrs --cmp`  | ~ 0.0008s                    | depends on disk speed                                  |
 | `nvrs --take` | ~ 0.001s                     | depends on disk speed                                  |
 
