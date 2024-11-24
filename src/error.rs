@@ -37,24 +37,31 @@ pub enum Error {
     #[error("{0}: version not found")]
     NoVersion(String),
 
+    /// explicitly specified configuration file not found
     #[error("specified config file not found")]
     NoConfigSpecified,
 
+    /// configuration file not found
     #[error("no config found\n{CONFIG_PATHS}")]
     NoConfig,
 
+    /// no `__config__` in the configuration file
     #[error("__config__ not specified\n{EXAMPLE_CONFIG_TABLE}")]
     NoConfigTable,
 
+    /// no `oldver` or `newver` in `__config__`
     #[error("oldver & newver not specified\n{EXAMPLE_CONFIG_TABLE}")]
     NoXVer,
 
+    /// verfile version != 2
     #[error("unsupported verfile version\nplease update your verfiles")]
     VerfileVer,
 
+    /// package not found in newver
     #[error("{0}: package not in newver")]
     PkgNotInNewver(String),
 
+    /// source / API not found
     #[error("source {0} not found")]
     SourceNotFound(String),
 }
