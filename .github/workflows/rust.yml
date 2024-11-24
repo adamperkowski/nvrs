@@ -57,6 +57,7 @@ jobs:
 
       - name: Test
         run: |
-          cargo test
-          cargo test --release
+          cargo test --lib
+          cargo test --lib --release
           cargo test --doc
+          cargo test --doc --release
