@@ -44,7 +44,7 @@ fn setup_headers() -> reqwest::header::HeaderMap {
 }
 
 #[cfg(feature = "http")]
-fn match_statuscode(req: &reqwest::Response) -> crate::error::Result<()> {
+fn match_statuscode(req: &reqwest::Response, package: String) -> crate::error::Result<()> {
     use crate::error;
     use reqwest::StatusCode;
 
@@ -52,9 +52,8 @@ fn match_statuscode(req: &reqwest::Response) -> crate::error::Result<()> {
 
     match status {
         StatusCode::OK => Ok(()),
-        StatusCode::FORBIDDEN => Err(error::Error::RequestForbidden),
-        StatusCode::NOT_FOUND => Err(error::Error::RequestNotFound),
-        _ => Err(error::Error::RequestNotOK),
+        StatusCode::FORBIDDEN => Err(error::Error::RequestForbidden(package)),
+        _ => Err(error::Error::RequestNotOK(package, status.to_string())),
     }
 }
 

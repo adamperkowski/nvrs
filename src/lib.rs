@@ -39,6 +39,6 @@ pub async fn run_source(
 
         Ok((api.func)(args).await?)
     } else {
-        Err(error::Error::SourceNotFound)
+        Err(error::Error::SourceNotFound(source))
     }
 }

@@ -85,7 +85,7 @@ async fn take(core: Core, take_names: Option<Vec<String>>) -> error::Result<()> 
                 oldver.data.data.insert(package_name, new_pkg.1.clone());
             }
         } else {
-            return Err(error::Error::PkgNotInNewver);
+            return Err(error::Error::PkgNotInNewver(package_name));
         }
     }
 

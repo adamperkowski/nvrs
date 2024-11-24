@@ -1,6 +1,5 @@
 //! [thiserror] implementation
 
-use colored::Colorize;
 use thiserror::Error as ThisError;
 
 const RATE_LIMIT: &str = "we might be getting rate-limited here";
@@ -29,17 +28,14 @@ pub enum Error {
     TOMLError(#[from] toml::de::Error),
 
     // custom errors
-    #[error("request didn't return 200")]
-    RequestNotOK,
+    #[error("{0}: request status != OK: {1}")]
+    RequestNotOK(String, String),
 
-    #[error("request returned 430\n{RATE_LIMIT}")]
-    RequestForbidden,
+    #[error("{0}: request returned 430\n{RATE_LIMIT}")]
+    RequestForbidden(String),
 
-    #[error("request returned 404 not found")]
-    RequestNotFound,
-
-    #[error("version not found")]
-    NoVersion,
+    #[error("{0}: version not found")]
+    NoVersion(String),
 
     #[error("specified config file not found")]
     NoConfigSpecified,
@@ -56,11 +52,11 @@ pub enum Error {
     #[error("unsupported verfile version\nplease update your verfiles")]
     VerfileVer,
 
-    #[error("package not in newver")]
-    PkgNotInNewver,
+    #[error("{0}: package not in newver")]
+    PkgNotInNewver(String),
 
-    #[error("source not found")]
-    SourceNotFound,
+    #[error("source {0} not found")]
+    SourceNotFound(String),
 }
 
 pub type Result<T> = std::result::Result<T, Error>;

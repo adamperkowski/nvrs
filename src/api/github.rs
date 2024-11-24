@@ -30,7 +30,7 @@ pub fn get_latest(args: api::ApiArgs) -> api::ReleaseFuture {
         let client = args.request_client;
 
         let result = client.get(url).headers(headers).send().await?;
-        api::match_statuscode(&result)?;
+        api::match_statuscode(&result, args.package)?;
 
         let json: GitHubResponse = result.json().await?;
 

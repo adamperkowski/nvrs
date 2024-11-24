@@ -17,7 +17,7 @@ pub fn get_latest(args: api::ApiArgs) -> api::ReleaseFuture {
         let client = args.request_client;
 
         let result = client.get(url).headers(api::setup_headers()).send().await?;
-        api::match_statuscode(&result)?;
+        api::match_statuscode(&result, args.package.clone())?;
 
         let json: AURResponse = result.json().await?;
 
@@ -30,7 +30,7 @@ pub fn get_latest(args: api::ApiArgs) -> api::ReleaseFuture {
                 url: String::new(),
             })
         } else {
-            Err(error::Error::NoVersion)
+            Err(error::Error::NoVersion(args.package))
         }
     })
 }
