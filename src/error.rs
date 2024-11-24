@@ -5,8 +5,8 @@ use thiserror::Error as ThisError;
 const RATE_LIMIT: &str = "we might be getting rate-limited here";
 const CONFIG_PATHS: &str = "config file locations:
  ~/.config/nvrs.toml
- ./nvrs.toml
-make sure the file is not empty";
+ ./nvrs.toml";
+const NOT_EMPTY: &str = "make sure the file is not empty";
 const EXAMPLE_CONFIG_TABLE: &str = "example:
 [__config__]
 oldver = \"oldver.json\"
@@ -28,7 +28,7 @@ pub enum Error {
     TOMLError(#[from] toml::de::Error),
 
     // custom errors
-    #[error("{0}: request status != OK: {1}")]
+    #[error("{0}: request status != OK\n{1}")]
     RequestNotOK(String, String),
 
     #[error("{0}: request returned 430\n{RATE_LIMIT}")]
@@ -42,12 +42,16 @@ pub enum Error {
     NoConfigSpecified,
 
     /// configuration file not found
-    #[error("no config found\n{CONFIG_PATHS}")]
+    #[error("no config found\n{CONFIG_PATHS}\n{NOT_EMPTY}")]
     NoConfig,
 
     /// no `__config__` in the configuration file
     #[error("__config__ not specified\n{EXAMPLE_CONFIG_TABLE}")]
     NoConfigTable,
+
+    /// keyfile specified in the configuration not found
+    #[error("specified keyfile not found\n{NOT_EMPTY}")]
+    NoKeyfile,
 
     /// no `oldver` or `newver` in `__config__`
     #[error("oldver & newver not specified\n{EXAMPLE_CONFIG_TABLE}")]

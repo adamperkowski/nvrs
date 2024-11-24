@@ -10,23 +10,6 @@ use std::{
 };
 use tokio::fs;
 
-// keyfile structure
-/*#[derive(Clone, Deserialize)]
-struct KeysTable {
-    #[cfg(feature = "github")]
-    #[serde(default)]
-    #[serde(skip_serializing_if = "is_empty_string")]
-    github: String,
-    #[cfg(feature = "gitlab")]
-    #[serde(default)]
-    #[serde(skip_serializing_if = "is_empty_string")]
-    gitlab: String,
-}
-#[derive(Clone, Deserialize)]
-struct Keyfile {
-    keys: KeysTable,
-}*/
-
 /// main configuration file structure
 ///
 /// see the [example `nvrs.toml`](https://github.com/adamperkowski/nvrs/blob/main/nvrs.toml)
@@ -44,7 +27,7 @@ pub struct Config {
 pub struct ConfigTable {
     pub oldver: Option<String>, // TODO: exceptions for empty oldver & newver entries
     pub newver: Option<String>,
-    keyfile: Option<String>,
+    pub keyfile: Option<String>,
 }
 
 /// package entry structure
@@ -94,19 +77,14 @@ impl Package {
 }
 
 /// global asynchronous function to load all config files
-pub async fn load(
-    custom_path: Option<String>,
-) -> error::Result<(Config, PathBuf /*, Option<Keyfile>*/)> {
+pub async fn load(custom_path: Option<String>) -> error::Result<(Config, PathBuf)> {
     if let Some(path) = custom_path {
         let config_path = Path::new(&path);
         if config_path.exists() && config_path.is_file() {
             let content = fs::read_to_string(config_path).await?;
             let toml_content: Config = toml::from_str(&content)?;
 
-            return Ok((
-                toml_content,
-                PathBuf::from(config_path), /*, load_keyfile(toml_content)*/
-            ));
+            return Ok((toml_content, PathBuf::from(config_path)));
         } else {
             return Err(error::Error::NoConfigSpecified);
         }
@@ -142,12 +120,7 @@ pub async fn load(
         return Err(error::Error::NoConfig);
     }
 
-    let toml_content = toml::from_str(&content)?;
-
-    Ok((
-        toml_content,
-        path_final, /*, load_keyfile(toml_content)*/
-    ))
+    Ok((toml::from_str(&content)?, path_final))
 }
 
 fn is_empty_string(s: &str) -> bool {

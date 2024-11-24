@@ -7,7 +7,7 @@
 [__config__]
 oldver = "oldver.json"
 newver = "newver.json"
-keyfile = "n_keyfile.toml"
+keyfile = "keyfile.toml"
 
 [hyprgui]
 source = "github"

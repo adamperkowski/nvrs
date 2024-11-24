@@ -18,7 +18,7 @@ pub struct ApiArgs {
     pub request_client: reqwest::Client,
     pub package: String,
     pub args: Vec<String>,
-    pub api_key: Option<String>,
+    pub api_key: String, // empty String if none
 }
 
 /// this is what `get_latest`s return

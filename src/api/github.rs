@@ -23,8 +23,8 @@ pub fn get_latest(args: api::ApiArgs) -> api::ReleaseFuture {
             "X-GitHub-Api-Version",
             HeaderValue::from_static("2022-11-28"),
         );
-        if let Some(key) = args.api_key {
-            let bearer = format!("Bearer {}", key);
+        if !args.api_key.is_empty() {
+            let bearer = format!("Bearer {}", args.api_key);
             headers.insert(AUTHORIZATION, HeaderValue::from_str(&bearer).unwrap());
         }
         let client = args.request_client;

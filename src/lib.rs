@@ -7,6 +7,7 @@
 pub mod api;
 pub mod config;
 pub mod error;
+pub mod keyfile;
 pub mod verfiles;
 
 /// example "core" vars structure
@@ -14,6 +15,7 @@ pub struct Core {
     pub config: config::Config,
     pub verfiles: (verfiles::Verfile, verfiles::Verfile),
     pub client: reqwest::Client,
+    pub keyfile: Option<keyfile::Keyfile>,
 }
 
 /// an asynchronous function that package's source and gets the latest release
@@ -28,15 +30,22 @@ pub struct Core {
 pub async fn run_source(
     package: (String, config::Package),
     client: reqwest::Client,
+    keyfile: Option<keyfile::Keyfile>,
 ) -> error::Result<api::Release> {
     let (source, api_args) = package.1.get_api();
 
     if let Some(api) = api::API_LIST.iter().find(|a| a.name == source) {
+        let api_key = if let Some(keyfile_content) = keyfile {
+            keyfile_content.get_key(api.name).await
+        } else {
+            String::new()
+        };
+
         let args = api::ApiArgs {
             request_client: client,
             package: package.0,
             args: api_args,
-            api_key: None,
+            api_key,
         };
 
         Ok((api.func)(args).await?)

@@ -32,12 +32,14 @@ async fn init() -> error::Result<(Core, cli::Cli)> {
 
     // TODO: this could be handled entirely within lib
     let verfiles = verfiles::load(config.0.__config__.clone()).await?;
+    let keyfile = keyfile::load(config.0.__config__.clone()).await?;
 
     Ok((
         Core {
             config: config.0,
             verfiles,
             client: reqwest::Client::new(),
+            keyfile,
         },
         cli,
     ))
@@ -117,7 +119,7 @@ async fn sync(core: Core) -> error::Result<()> {
         .packages
         .clone()
         .into_iter()
-        .map(|pkg| tokio::spawn(run_source(pkg, core.client.clone())))
+        .map(|pkg| tokio::spawn(run_source(pkg, core.client.clone(), core.keyfile.clone())))
         .collect();
 
     let mut results = futures::future::join_all(tasks).await;

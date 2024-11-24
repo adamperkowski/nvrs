@@ -20,8 +20,11 @@ pub fn get_latest(args: api::ApiArgs) -> api::ReleaseFuture {
             args.args[0].replace("/", "%2F")
         );
         let mut headers = api::setup_headers();
-        if let Some(key) = args.api_key {
-            headers.insert("PRIVATE-TOKEN", HeaderValue::from_str(&key).unwrap());
+        if !args.api_key.is_empty() {
+            headers.insert(
+                "PRIVATE-TOKEN",
+                HeaderValue::from_str(&args.api_key).unwrap(),
+            );
         };
         let client = args.request_client;
 
