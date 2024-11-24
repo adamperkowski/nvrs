@@ -44,13 +44,11 @@ fn setup_headers() -> reqwest::header::HeaderMap {
 }
 
 #[cfg(feature = "http")]
-fn match_statuscode(req: &reqwest::Response, package: String) -> crate::error::Result<()> {
+fn match_statuscode(status: &reqwest::StatusCode, package: String) -> crate::error::Result<()> {
     use crate::error;
     use reqwest::StatusCode;
 
-    let status = req.status();
-
-    match status {
+    match status.to_owned() {
         StatusCode::OK => Ok(()),
         StatusCode::FORBIDDEN => Err(error::Error::RequestForbidden(package)),
         _ => Err(error::Error::RequestNotOK(package, status.to_string())),
@@ -76,4 +74,10 @@ pub const API_LIST: &[Api] = &[
     },
 ];
 
-// TODO: tests
+#[test]
+fn statuscode_matching_test() {
+    use reqwest::StatusCode;
+
+    assert!(match_statuscode(&StatusCode::OK, String::new()).is_ok());
+    assert!(match_statuscode(&StatusCode::IM_A_TEAPOT, String::new()).is_err());
+}

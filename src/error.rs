@@ -72,18 +72,12 @@ pub enum Error {
 
 pub type Result<T> = std::result::Result<T, Error>;
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use std::io::Error as IOError;
-
-    #[test]
-    fn test_error() {
-        let message = "nvrs died. now why could that be...?";
-        let error = Error::from(IOError::other(message));
-        assert_eq!(
-            format!("\"io error: {message}\""),
-            format!("{:?}", error.to_string())
-        )
-    }
+#[test]
+fn test_error() {
+    let message = "nvrs died. now why could that be...?";
+    let error = Error::from(std::io::Error::other(message));
+    assert_eq!(
+        format!("\"io error: {message}\""),
+        format!("{:?}", error.to_string())
+    )
 }

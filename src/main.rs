@@ -30,7 +30,6 @@ async fn init() -> error::Result<(Core, cli::Cli)> {
     let cli = cli::get_args();
     let config = config::load(cli.clone().custom_config).await?;
 
-    // TODO: this could be handled entirely within lib
     let verfiles = verfiles::load(config.0.__config__.clone()).await?;
     let keyfile = keyfile::load(config.0.__config__.clone()).await?;
 
@@ -209,4 +208,9 @@ fn pretty_error(err: &error::Error) {
     for line in lines {
         println!("{}  {}", "!".red().on_black(), line)
     }
+}
+
+#[tokio::test]
+async fn core_initializing() {
+    assert!(init().await.is_ok())
 }

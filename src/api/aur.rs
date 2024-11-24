@@ -17,7 +17,7 @@ pub fn get_latest(args: api::ApiArgs) -> api::ReleaseFuture {
         let client = args.request_client;
 
         let result = client.get(url).headers(api::setup_headers()).send().await?;
-        api::match_statuscode(&result, args.package.clone())?;
+        api::match_statuscode(&result.status(), args.package.clone())?;
 
         let json: AURResponse = result.json().await?;
 
@@ -33,4 +33,17 @@ pub fn get_latest(args: api::ApiArgs) -> api::ReleaseFuture {
             Err(error::Error::NoVersion(args.package))
         }
     })
+}
+
+#[tokio::test]
+async fn request_test() {
+    let package = "permitter".to_string();
+    let args = api::ApiArgs {
+        package: package.clone(),
+        args: vec![package],
+        api_key: String::new(),
+        request_client: reqwest::Client::new(),
+    };
+
+    assert!(get_latest(args).await.is_ok());
 }

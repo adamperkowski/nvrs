@@ -39,7 +39,6 @@ pub struct Verfile {
     pub data: VerData,
 }
 
-// TODO: move `load` & `save` logic into `config.rs` maybe
 /// load the verfiles specified in [crate::config::ConfigTable]
 pub async fn load(config_table: Option<config::ConfigTable>) -> error::Result<(Verfile, Verfile)> {
     if config_table.is_none() {

@@ -29,7 +29,7 @@ pub fn get_latest(args: api::ApiArgs) -> api::ReleaseFuture {
         let client = args.request_client;
 
         let result = client.get(url).headers(headers).send().await?;
-        api::match_statuscode(&result, args.package)?;
+        api::match_statuscode(&result.status(), args.package)?;
 
         let json: GitLabResponse = result.json().await?;
 
@@ -39,4 +39,20 @@ pub fn get_latest(args: api::ApiArgs) -> api::ReleaseFuture {
             url: format!("https://{}{}", host, json.tag_path),
         })
     })
+}
+
+#[tokio::test]
+async fn request_test() {
+    let package = "mkinitcpio".to_string();
+    let args = api::ApiArgs {
+        package: package.clone(),
+        args: vec![
+            format!("archlinux/{0}/{0}", package),
+            "gitlab.archlinux.org".to_string(),
+        ],
+        api_key: String::new(),
+        request_client: reqwest::Client::new(),
+    };
+
+    assert!(get_latest(args).await.is_ok());
 }

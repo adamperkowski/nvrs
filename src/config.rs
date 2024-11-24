@@ -26,7 +26,7 @@ pub struct Config {
 /// see the [example `nvrs.toml`](https://github.com/adamperkowski/nvrs/blob/main/nvrs.toml)
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct ConfigTable {
-    pub oldver: Option<String>, // TODO: exceptions for empty oldver & newver entries
+    pub oldver: Option<String>,
     pub newver: Option<String>,
     pub keyfile: Option<String>,
 }
@@ -60,6 +60,7 @@ pub struct Package {
     pub prefix: String,
 }
 
+// TODO: Package defaults & tests
 impl Package {
     /// global function to get various API-specific agrs for a package
     ///
@@ -136,4 +137,16 @@ fn is_empty_string(s: &str) -> bool {
     s.is_empty()
 }
 
-// TODO: tests
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[tokio::test]
+    async fn loading() {
+        let config = load(None).await.unwrap();
+
+        // TODO: here, ref L47
+
+        assert_eq!(config.1, PathBuf::from("nvrs.toml"));
+    }
+}

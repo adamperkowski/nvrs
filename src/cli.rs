@@ -72,5 +72,3 @@ pub fn get_args() -> Cli {
 
     cli
 }
-
-// TODO: tests

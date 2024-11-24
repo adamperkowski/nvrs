@@ -30,7 +30,7 @@ pub fn get_latest(args: api::ApiArgs) -> api::ReleaseFuture {
         let client = args.request_client;
 
         let result = client.get(url).headers(headers).send().await?;
-        api::match_statuscode(&result, args.package)?;
+        api::match_statuscode(&result.status(), args.package)?;
 
         let json: GitHubResponse = result.json().await?;
 
@@ -40,4 +40,17 @@ pub fn get_latest(args: api::ApiArgs) -> api::ReleaseFuture {
             url: json.html_url,
         })
     })
+}
+
+#[tokio::test]
+async fn request_test() {
+    let package = "nvrs".to_string();
+    let args = api::ApiArgs {
+        package: package.clone(),
+        args: vec![format!("adamperkowski/{}", package)],
+        api_key: String::new(),
+        request_client: reqwest::Client::new(),
+    };
+
+    assert!(get_latest(args).await.is_ok());
 }
