@@ -1,34 +1,35 @@
 use colored::Colorize;
 use nvrs::*;
 
+mod cli;
+
 #[tokio::main]
 async fn main() -> error::Result<()> {
     let core = init().await?;
 
-    if core.cli.cmp {
-        compare(core).await;
-    } else if core.cli.take.is_some() {
-        take(core).await?;
+    if core.1.cmp {
+        compare(core.0).await;
+    } else if core.1.take.is_some() {
+        take(core.0, core.1.take).await?;
     } else {
-        sync(core).await?;
+        sync(core.0).await?;
     }
 
     Ok(())
 }
 
-async fn init() -> error::Result<Core> {
+async fn init() -> error::Result<(Core, cli::Cli)> {
     let cli = cli::get_args();
     let config = config::load(cli.clone().custom_config).await?;
 
     // TODO: this could be handled entirely within lib
     let verfiles = verfiles::load(config.0.__config__.clone()).await?;
 
-    Ok(Core {
-        cli,
+    Ok((Core {
         config: config.0,
         verfiles,
         client: reqwest::Client::new(),
-    })
+    }, cli))
 }
 
 async fn compare(core: Core) {
@@ -55,8 +56,8 @@ async fn compare(core: Core) {
     }
 }
 
-async fn take(core: Core) -> error::Result<()> {
-    let names = core.cli.take.unwrap();
+async fn take(core: Core, take_names: Option<Vec<String>>) -> error::Result<()> {
+    let names = take_names.unwrap();
     let config = core.config;
     let (mut oldver, newver) = core.verfiles;
 

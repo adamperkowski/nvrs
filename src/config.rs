@@ -1,3 +1,7 @@
+//! operations on configuration files
+///
+/// see the [example `nvrs.toml`](https://github.com/adamperkowski/nvrs/blob/main/nvrs.toml)
+
 use crate::error;
 use serde::{Deserialize, Serialize};
 use std::{
@@ -24,8 +28,19 @@ struct Keyfile {
     keys: KeysTable,
 }*/
 
-// main config file
-// __config__ structure
+/// main configuration file structure
+///
+/// see the [example `nvrs.toml`](https://github.com/adamperkowski/nvrs/blob/main/nvrs.toml)
+#[derive(Debug, Clone, Deserialize, Serialize)]
+pub struct Config {
+    pub __config__: Option<ConfigTable>,
+    #[serde(flatten)]
+    pub packages: BTreeMap<String, Package>,
+}
+
+/// `__config__` structure
+///
+/// see the [example `nvrs.toml`](https://github.com/adamperkowski/nvrs/blob/main/nvrs.toml)
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct ConfigTable {
     pub oldver: Option<String>, // TODO: exceptions for empty oldver & newver entries
@@ -33,7 +48,9 @@ pub struct ConfigTable {
     keyfile: Option<String>,
 }
 
-// package entry structure
+/// package entry structure
+///
+/// see the [example `nvrs.toml`](https://github.com/adamperkowski/nvrs/blob/main/nvrs.toml)
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct Package {
     source: String, // ex. "github", "aur"
@@ -60,15 +77,8 @@ pub struct Package {
     pub prefix: String,
 }
 
-#[derive(Debug, Clone, Deserialize, Serialize)]
-pub struct Config {
-    pub __config__: Option<ConfigTable>,
-    #[serde(flatten)]
-    pub packages: BTreeMap<String, Package>,
-}
-
 impl Package {
-    // global function to pass API agrs
+    /// global function to get various API-specific agrs for a package
     pub fn get_api(&self) -> (String, Vec<String>) {
         let args = match self.source.as_str() {
             #[cfg(feature = "aur")]
@@ -84,6 +94,7 @@ impl Package {
     }
 }
 
+/// global asynchronous function to load all config files
 pub async fn load(
     custom_path: Option<String>,
 ) -> error::Result<(Config, PathBuf /*, Option<Keyfile>*/)> {

@@ -1,3 +1,5 @@
+//! [thiserror] implementation
+
 use colored::Colorize;
 use thiserror::Error as ThisError;
 
@@ -63,7 +65,7 @@ pub enum Error {
 
 pub type Result<T> = std::result::Result<T, Error>;
 
-// TODO: force
+/*
 pub fn custom_error(title: &'static str, message: String, exit: bool /*, force: bool*/) {
     println!("! {}{}", title.red(), message.replace("\n", "\n  "));
 
@@ -71,6 +73,7 @@ pub fn custom_error(title: &'static str, message: String, exit: bool /*, force: 
         std::process::exit(1);
     }
 }
+*/
 
 #[cfg(test)]
 mod tests {

@@ -1,11 +1,12 @@
+//! operations on version files
+//!
+//! see `newver` & `oldver` in [crate::config::ConfigTable]
+
 use serde::{Deserialize, Serialize};
 use std::{collections::BTreeMap, path::Path};
 use tokio::{fs, io::AsyncWriteExt};
 
 use crate::{config, error};
-
-// this module handles operations on verfiles.
-// see `newver` & `oldver` in `config.rs`
 
 // verfiles get created from this
 const TEMPLATE: &str = r#"{
@@ -14,7 +15,13 @@ const TEMPLATE: &str = r#"{
 }
 "#;
 
-// package entry structure
+/// main data structure
+#[derive(Serialize, Deserialize)]
+pub struct VerData {
+    pub data: BTreeMap<String, VerPackage>,
+}
+
+/// package entry structure
 #[derive(Clone, Serialize, Deserialize)]
 pub struct VerPackage {
     pub version: String,
@@ -24,13 +31,7 @@ pub struct VerPackage {
     pub url: String,
 }
 
-// main data structure
-#[derive(Serialize, Deserialize)]
-pub struct VerData {
-    pub data: BTreeMap<String, VerPackage>,
-}
-
-// file structure
+/// file structure
 #[derive(Serialize, Deserialize)]
 pub struct Verfile {
     version: u8,
@@ -39,6 +40,7 @@ pub struct Verfile {
 }
 
 // TODO: move `load` & `save` logic into `config.rs` maybe
+/// asynchronous function for loading the verfiles
 pub async fn load(config_table: Option<config::ConfigTable>) -> error::Result<(Verfile, Verfile)> {
     if config_table.is_none() {
         return Err(error::Error::NoConfigTable);
@@ -59,6 +61,7 @@ pub async fn load(config_table: Option<config::ConfigTable>) -> error::Result<(V
     }
 }
 
+/// asynchronous function for saving changes to the verfiles
 pub async fn save(
     verfile: Verfile,
     is_oldver: bool,

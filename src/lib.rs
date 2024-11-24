@@ -1,28 +1,28 @@
-// nvrs - fast new version checker for software releases 🦀
+//! nvrs - fast new version checker for software releases 🚦🦀
+//!
+//! nvrs is still a WIP<br>
+//! new features & bugfixes are being pushed every day<br>
+//! you may encounter some issues. please consider [submitting feedback](https://github.com/adamperkowski/nvrs/issues/new/choose) if you do.
 
-// thiserror implementation
-pub mod error;
-
-// communication with sources
 pub mod api;
-
-// command-line arguments
-pub mod cli;
-
-// operations on configuration files
 pub mod config;
-
-// operations on version files
+pub mod error;
 pub mod verfiles;
 
-// example "core" vars structure
+/// example "core" vars structure
 pub struct Core {
-    pub cli: cli::Cli,
     pub config: config::Config,
     pub verfiles: (verfiles::Verfile, verfiles::Verfile),
     pub client: reqwest::Client,
 }
 
+/// an asynchronous function that package's source and gets the latest release
+/// # example usage
+/// ```rust
+/// let package = "nvrs";
+/// let client = reqwest::Client::new();
+/// run_source(package, client).await;
+/// ```
 pub async fn run_source(
     package: (String, config::Package),
     client: reqwest::Client,

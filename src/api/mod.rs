@@ -1,3 +1,5 @@
+//! this module handles management & communication with sources, also knows as APIs
+
 #[cfg(feature = "aur")]
 mod aur;
 #[cfg(feature = "github")]
@@ -5,7 +7,21 @@ mod github;
 #[cfg(feature = "gitlab")]
 mod gitlab;
 
-// this is what `get_latest`s return
+/// struct containing the API name & a pointer to API's `get_latest` function
+pub struct Api {
+    pub name: &'static str,
+    pub func: fn(ApiArgs) -> ReleaseFuture,
+}
+
+/// arguments passed to a source
+pub struct ApiArgs {
+    pub request_client: reqwest::Client,
+    pub package: String,
+    pub args: Vec<String>,
+    pub api_key: Option<String>,
+}
+
+/// this is what `get_latest`s return
 #[derive(Debug)]
 pub struct Release {
     pub name: String,
@@ -13,28 +29,12 @@ pub struct Release {
     pub url: String,
 }
 
-pub struct ApiArgs {
-    pub request_client: reqwest::Client,
-    pub package: String,
-    //pub target: String, // equivalent to ex. `github = "adamperkowski/nvrs"` in the config
-    //pub host: Option<String>,
-    pub args: Vec<String>,
-    pub api_key: Option<String>,
-}
-
 // this is necessary because we need to store a reference to an async function in `Api`
 type ReleaseFuture =
     std::pin::Pin<Box<dyn std::future::Future<Output = crate::error::Result<Release>> + Send>>;
 
-pub struct Api {
-    pub name: &'static str,
-    pub func: fn(ApiArgs) -> ReleaseFuture,
-}
-
-// TODO: consider not using ReleaseFuture & Source. just calling by name
-
 #[cfg(feature = "http")]
-pub fn setup_headers() -> reqwest::header::HeaderMap {
+fn setup_headers() -> reqwest::header::HeaderMap {
     use reqwest::header::{HeaderMap, HeaderValue, USER_AGENT};
 
     let mut headers = HeaderMap::new();
@@ -44,7 +44,7 @@ pub fn setup_headers() -> reqwest::header::HeaderMap {
 }
 
 #[cfg(feature = "http")]
-pub fn match_statuscode(req: &reqwest::Response) -> crate::error::Result<()> {
+fn match_statuscode(req: &reqwest::Response) -> crate::error::Result<()> {
     use crate::error;
     use reqwest::StatusCode;
 
@@ -58,6 +58,7 @@ pub fn match_statuscode(req: &reqwest::Response) -> crate::error::Result<()> {
     }
 }
 
+/// public list of available sources
 pub const API_LIST: &[Api] = &[
     #[cfg(feature = "aur")]
     Api {
