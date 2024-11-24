@@ -45,3 +45,15 @@ jobs:
           cargo build --verbose
           cargo build --release --verbose
 
+  test:
+    runs-on: ubuntu-latest
+    needs: build
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Test
+        run: |
+          cargo test
+          cargo test --release
+          cargo test --doc

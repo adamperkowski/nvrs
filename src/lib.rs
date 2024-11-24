@@ -18,11 +18,13 @@ pub struct Core {
 
 /// an asynchronous function that package's source and gets the latest release
 /// # example usage
-/// ```rust
-/// let package = "nvrs";
+/// ```rust,ignore
+/// let package_name = "nvrs".to_string();
 /// let client = reqwest::Client::new();
-/// run_source(package, client).await;
+///
+/// run_source((package_name, package), client).await;
 /// ```
+/// see [crate::config::Package] for `package`
 pub async fn run_source(
     package: (String, config::Package),
     client: reqwest::Client,
