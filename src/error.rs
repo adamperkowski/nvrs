@@ -72,16 +72,6 @@ pub enum Error {
 
 pub type Result<T> = std::result::Result<T, Error>;
 
-/*
-pub fn custom_error(title: &'static str, message: String, exit: bool /*, force: bool*/) {
-    println!("! {}{}", title.red(), message.replace("\n", "\n  "));
-
-    if exit {
-        std::process::exit(1);
-    }
-}
-*/
-
 #[cfg(test)]
 mod tests {
     use super::*;

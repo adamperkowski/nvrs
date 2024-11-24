@@ -1,10 +1,10 @@
 //! operations on keyfiles
-use std::path::Path;
+//!
+//! see the [example `nvrs.toml`](https://github.com/adamperkowski/nvrs/blob/main/nvrs.toml) & [example `keyfile.toml`](https://github.com/adamperkowski/nvrs/blob/main/n_keyfile.toml)
 
-///
-/// see the [example `nvrs.toml`](https://github.com/adamperkowski/nvrs/blob/main/nvrs.toml) & [example `keyfile.toml`](https://github.com/adamperkowski/nvrs/blob/main/n_keyfile.toml)
 use crate::{config, error};
 use serde::Deserialize;
+use std::path::Path;
 use tokio::fs;
 
 /// keyfile structure
@@ -31,7 +31,7 @@ struct KeysTable {
 }
 
 impl Keyfile {
-    /// returns the API key for the specified API name (empty string if not found)
+    /// returns API key for the specified API name (empty string if not found)
     pub async fn get_key(&self, api_name: &str) -> String {
         match api_name {
             #[cfg(feature = "github")]

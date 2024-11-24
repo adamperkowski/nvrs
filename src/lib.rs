@@ -1,8 +1,14 @@
 //! nvrs - fast new version checker for software releases 🚦🦀
 //!
-//! nvrs is still a WIP<br>
-//! new features & bugfixes are being pushed every day<br>
+//! <div class="warning">
+//!
+//! nvrs is still a WIP
+//!
+//! new features & bugfixes are being pushed every day
+//!
 //! you may encounter some issues. please consider [submitting feedback](https://github.com/adamperkowski/nvrs/issues/new/choose) if you do.
+//!
+//! </div>
 
 pub mod api;
 pub mod config;
@@ -10,7 +16,25 @@ pub mod error;
 pub mod keyfile;
 pub mod verfiles;
 
-/// example "core" vars structure
+/// "core" vars structure
+///
+/// # example usage
+/// ```rust
+/// # tokio_test::block_on(async {
+/// use nvrs::*;
+///
+/// let config = config::load(None).await.unwrap();
+/// let verfiles = verfiles::load(config.0.__config__.clone()).await.unwrap();
+/// let keyfile = keyfile::load(config.0.__config__.clone()).await.unwrap();
+///
+/// Core {
+///     config: config.0,
+///     verfiles,
+///     client: reqwest::Client::new(),
+///     keyfile,
+/// };
+/// # })
+/// ```
 pub struct Core {
     pub config: config::Config,
     pub verfiles: (verfiles::Verfile, verfiles::Verfile),
@@ -21,10 +45,14 @@ pub struct Core {
 /// an asynchronous function that package's source and gets the latest release
 /// # example usage
 /// ```rust,ignore
+/// # tokio_test::block_on(async {
+/// use nvrs::run_source;
+///
 /// let package_name = "nvrs".to_string();
 /// let client = reqwest::Client::new();
 ///
 /// run_source((package_name, package), client).await;
+/// # })
 /// ```
 /// see [crate::config::Package] for `package`
 pub async fn run_source(

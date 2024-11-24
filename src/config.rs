@@ -1,6 +1,7 @@
 //! operations on configuration files
-///
-/// see the [example `nvrs.toml`](https://github.com/adamperkowski/nvrs/blob/main/nvrs.toml)
+//!
+//! see the [example `nvrs.toml`](https://github.com/adamperkowski/nvrs/blob/main/nvrs.toml)
+
 use crate::error;
 use serde::{Deserialize, Serialize};
 use std::{
@@ -20,7 +21,7 @@ pub struct Config {
     pub packages: BTreeMap<String, Package>,
 }
 
-/// `__config__` structure
+/// `__config__` table structure
 ///
 /// see the [example `nvrs.toml`](https://github.com/adamperkowski/nvrs/blob/main/nvrs.toml)
 #[derive(Debug, Clone, Deserialize, Serialize)]
@@ -61,6 +62,14 @@ pub struct Package {
 
 impl Package {
     /// global function to get various API-specific agrs for a package
+    ///
+    /// # example
+    /// ```rust,ignore
+    /// // package has `source = "github"` * `github = "adamperkowski/nvrs"` specified
+    /// let args = package.get_api();
+    ///
+    /// assert_eq!(package, ("github", vec!["adamperkowski/nvrs"]))
+    /// ```
     pub fn get_api(&self) -> (String, Vec<String>) {
         let args = match self.source.as_str() {
             #[cfg(feature = "aur")]

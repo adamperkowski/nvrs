@@ -40,7 +40,7 @@ pub struct Verfile {
 }
 
 // TODO: move `load` & `save` logic into `config.rs` maybe
-/// asynchronous function for loading the verfiles
+/// load the verfiles specified in [crate::config::ConfigTable]
 pub async fn load(config_table: Option<config::ConfigTable>) -> error::Result<(Verfile, Verfile)> {
     if config_table.is_none() {
         return Err(error::Error::NoConfigTable);
@@ -61,7 +61,7 @@ pub async fn load(config_table: Option<config::ConfigTable>) -> error::Result<(V
     }
 }
 
-/// asynchronous function for saving changes to the verfiles
+/// save changes to the verfiles
 pub async fn save(
     verfile: Verfile,
     is_oldver: bool,
