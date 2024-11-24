@@ -12,15 +12,15 @@ async fn main() -> error::Result<()> {
             } else if core.1.take.is_some() {
                 take(core.0, core.1.take).await
             } else {
-                sync(core.0).await
+                sync(core.0, core.1.no_fail).await
             };
 
             match res {
                 Ok(_) => (),
-                Err(e) => pretty_error(e),
+                Err(e) => pretty_error(&e),
             }
         }
-        Err(e) => pretty_error(e),
+        Err(e) => pretty_error(&e),
     }
 
     Ok(())
@@ -111,7 +111,7 @@ async fn take(core: Core, take_names: Option<Vec<String>>) -> error::Result<()> 
     verfiles::save(oldver, true, config.__config__).await
 }
 
-async fn sync(core: Core) -> error::Result<()> {
+async fn sync(core: Core, no_fail: bool) -> error::Result<()> {
     let config = core.config;
     let (_, mut newver) = core.verfiles;
 
@@ -125,62 +125,70 @@ async fn sync(core: Core) -> error::Result<()> {
     let mut results = futures::future::join_all(tasks).await;
 
     for package in config.packages {
-        let release = results.remove(0).unwrap()?;
+        match results.remove(0).unwrap() {
+            Ok(release) => {
+                if let Some(new_pkg) = newver.data.data.iter_mut().find(|p| p.0 == &package.0) {
+                    let gitref: String;
+                    let tag = if let Some(t) = release.tag.clone() {
+                        gitref = format!("refs/tags/{}", t);
+                        release.tag.unwrap().replacen(&package.1.prefix, "", 1)
+                    } else {
+                        gitref = String::new();
+                        release.name
+                    };
 
-        if let Some(new_pkg) = newver.data.data.iter_mut().find(|p| p.0 == &package.0) {
-            let gitref: String;
-            let tag = if let Some(t) = release.tag.clone() {
-                gitref = format!("refs/tags/{}", t);
-                release.tag.unwrap().replacen(&package.1.prefix, "", 1)
-            } else {
-                gitref = String::new();
-                release.name
-            };
+                    if new_pkg.1.version != tag {
+                        println!(
+                            "{} {} {} -> {}",
+                            "|".white().on_black(),
+                            package.0.blue(),
+                            new_pkg.1.version.red(),
+                            tag.green()
+                        );
+                        new_pkg.1.version = tag.clone();
+                        new_pkg.1.gitref = gitref;
+                        new_pkg.1.url = release.url;
+                    }
+                } else {
+                    let gitref: String;
+                    let tag = if let Some(t) = release.tag.clone() {
+                        gitref = format!("refs/tags/{}", t);
+                        release.tag.unwrap().replacen(&package.1.prefix, "", 1)
+                    } else {
+                        gitref = String::new();
+                        release.name
+                    };
 
-            if new_pkg.1.version != tag {
-                println!(
-                    "{} {} {} -> {}",
-                    "|".white().on_black(),
-                    package.0.blue(),
-                    new_pkg.1.version.red(),
-                    tag.green()
-                );
-                new_pkg.1.version = tag.clone();
-                new_pkg.1.gitref = gitref;
-                new_pkg.1.url = release.url;
+                    println!(
+                        "{} {} {} -> {}",
+                        "|".white().on_black(),
+                        package.0.blue(),
+                        "NONE".red(),
+                        tag.green()
+                    );
+                    newver.data.data.insert(
+                        package.0,
+                        verfiles::VerPackage {
+                            version: tag.clone(),
+                            gitref,
+                            url: release.url,
+                        },
+                    );
+                }
             }
-        } else {
-            let gitref: String;
-            let tag = if let Some(t) = release.tag.clone() {
-                gitref = format!("refs/tags/{}", t);
-                release.tag.unwrap().replacen(&package.1.prefix, "", 1)
-            } else {
-                gitref = String::new();
-                release.name
-            };
-
-            println!(
-                "{} {} {} -> {}",
-                "|".white().on_black(),
-                package.0.blue(),
-                "NONE".red(),
-                tag.green()
-            );
-            newver.data.data.insert(
-                package.0,
-                verfiles::VerPackage {
-                    version: tag.clone(),
-                    gitref,
-                    url: release.url,
-                },
-            );
-        }
+            Err(e) => {
+                pretty_error(&e);
+                if !no_fail {
+                    return Err(e);
+                }
+            }
+        };
     }
 
     verfiles::save(newver, false, config.__config__).await
 }
 
-fn pretty_error(err: error::Error) {
+fn pretty_error(err: &error::Error) {
     let mut lines: Vec<String> = err
         .to_string()
         .lines()
