@@ -5,14 +5,22 @@ mod cli;
 
 #[tokio::main]
 async fn main() -> error::Result<()> {
-    let core = init().await?;
+    match init().await {
+        Ok(core) => {
+            let res = if core.1.cmp {
+                compare(core.0).await
+            } else if core.1.take.is_some() {
+                take(core.0, core.1.take).await
+            } else {
+                sync(core.0).await
+            };
 
-    if core.1.cmp {
-        compare(core.0).await;
-    } else if core.1.take.is_some() {
-        take(core.0, core.1.take).await?;
-    } else {
-        sync(core.0).await?;
+            match res {
+                Ok(_) => (),
+                Err(e) => pretty_error(e),
+            }
+        }
+        Err(e) => pretty_error(e),
     }
 
     Ok(())
@@ -25,21 +33,25 @@ async fn init() -> error::Result<(Core, cli::Cli)> {
     // TODO: this could be handled entirely within lib
     let verfiles = verfiles::load(config.0.__config__.clone()).await?;
 
-    Ok((Core {
-        config: config.0,
-        verfiles,
-        client: reqwest::Client::new(),
-    }, cli))
+    Ok((
+        Core {
+            config: config.0,
+            verfiles,
+            client: reqwest::Client::new(),
+        },
+        cli,
+    ))
 }
 
-async fn compare(core: Core) {
+async fn compare(core: Core) -> error::Result<()> {
     let (oldver, newver) = core.verfiles;
 
     for new_pkg in newver.data.data {
         if let Some(old_pkg) = oldver.data.data.iter().find(|p| p.0 == &new_pkg.0) {
             if old_pkg.1.version != new_pkg.1.version {
                 println!(
-                    "* {} {} -> {}",
+                    "{} {} {} -> {}",
+                    "*".white().on_black(),
                     new_pkg.0.blue(),
                     old_pkg.1.version.red(),
                     new_pkg.1.version.blue()
@@ -47,13 +59,16 @@ async fn compare(core: Core) {
             }
         } else {
             println!(
-                "* {} {} -> {}",
+                "{} {} {} -> {}",
+                "*".white().on_black(),
                 new_pkg.0.blue(),
                 "NONE".red(),
                 new_pkg.1.version.green()
             );
         }
     }
+
+    Ok(())
 }
 
 async fn take(core: Core, take_names: Option<Vec<String>>) -> error::Result<()> {
@@ -66,7 +81,8 @@ async fn take(core: Core, take_names: Option<Vec<String>>) -> error::Result<()> 
             if let Some(old_pkg) = oldver.data.data.iter_mut().find(|p| p.0 == &package_name) {
                 if old_pkg.1.version != new_pkg.1.version {
                     println!(
-                        "+ {} {} -> {}",
+                        "{} {} {} -> {}",
+                        "+".white().on_black(),
                         package_name.blue(),
                         old_pkg.1.version.red(),
                         new_pkg.1.version.green()
@@ -77,7 +93,8 @@ async fn take(core: Core, take_names: Option<Vec<String>>) -> error::Result<()> 
                 }
             } else {
                 println!(
-                    "+ {} {} -> {}",
+                    "{} {} {} -> {}",
+                    "+".white().on_black(),
                     package_name.blue(),
                     "NONE".red(),
                     new_pkg.1.version.green()
@@ -120,7 +137,8 @@ async fn sync(core: Core) -> error::Result<()> {
 
             if new_pkg.1.version != tag {
                 println!(
-                    "| {} {} -> {}",
+                    "{} {} {} -> {}",
+                    "|".white().on_black(),
                     package.0.blue(),
                     new_pkg.1.version.red(),
                     tag.green()
@@ -139,7 +157,13 @@ async fn sync(core: Core) -> error::Result<()> {
                 release.name
             };
 
-            println!("| {} {} -> {}", package.0.blue(), "NONE".red(), tag.green());
+            println!(
+                "{} {} {} -> {}",
+                "|".white().on_black(),
+                package.0.blue(),
+                "NONE".red(),
+                tag.green()
+            );
             newver.data.data.insert(
                 package.0,
                 verfiles::VerPackage {
@@ -152,4 +176,27 @@ async fn sync(core: Core) -> error::Result<()> {
     }
 
     verfiles::save(newver, false, config.__config__).await
+}
+
+fn pretty_error(err: error::Error) {
+    let mut lines: Vec<String> = err
+        .to_string()
+        .lines()
+        .map(|line| line.to_string())
+        .collect();
+    let first = lines.remove(0);
+    let first_split = first.split_once(':').unwrap_or(("", &first));
+    if first_split.0.is_empty() {
+        println!("{} {}", "!".red().bold().on_black(), first_split.1.red());
+    } else {
+        println!(
+            "{} {}:{}",
+            "!".red().bold().on_black(),
+            first_split.0,
+            first_split.1.red()
+        );
+    }
+    for line in lines {
+        println!("{}  {}", "!".red().on_black(), line)
+    }
 }

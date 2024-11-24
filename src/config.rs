@@ -1,7 +1,6 @@
 //! operations on configuration files
 ///
 /// see the [example `nvrs.toml`](https://github.com/adamperkowski/nvrs/blob/main/nvrs.toml)
-
 use crate::error;
 use serde::{Deserialize, Serialize};
 use std::{
