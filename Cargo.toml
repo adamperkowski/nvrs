@@ -50,3 +50,7 @@ opt-level = "z"
 [profile.bench]
 opt-level = 3
 debug = false
+
+[[bench]]
+name = "nvrs_bench"
+harness = false

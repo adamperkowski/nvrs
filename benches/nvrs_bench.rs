@@ -10,59 +10,91 @@ fn configure_criterion() -> Criterion {
 
 fn bench_config_load(c: &mut Criterion) {
     let rt = Runtime::new().unwrap();
-    let mut group = c.benchmark_group("config_operations");
+    let mut group = c.benchmark_group("config");
 
-    group.bench_function("config_load", |b| {
+    group.bench_function("config_loading", |b| {
         b.iter(|| rt.block_on(nvrs::config::load(None)))
     });
 
     group.finish();
 }
 
-fn bench_verfile_operations(c: &mut Criterion) {
+fn bench_verfiles(c: &mut Criterion) {
     let rt = Runtime::new().unwrap();
-    let mut group = c.benchmark_group("verfile_operations");
+    let mut group = c.benchmark_group("verfiles");
 
     let config = rt.block_on(nvrs::config::load(None)).unwrap();
 
-    group.bench_function("verfile_load", |b| {
+    group.bench_function("verfile_loading", |b| {
         b.iter(|| rt.block_on(nvrs::verfiles::load(config.0.__config__.clone())))
     });
 
     group.finish();
 }
 
-#[cfg(feature = "aur")]
 fn bench_aur_requests(c: &mut Criterion) {
-    let rt = Runtime::new().unwrap();
-    let mut group = c.benchmark_group("aur_operations");
+    #[cfg(feature = "aur")]
+    {
+        let rt = Runtime::new().unwrap();
+        let mut group = c.benchmark_group("requests");
 
-    let mock_package = nvrs::config::Package::new(
-        "aur".to_string(),
-        "hyprland-git".to_string(),
-        false,
-        String::new(),
-    )
-    .unwrap();
+        let mock_package = nvrs::config::Package::new(
+            "aur".to_string(),
+            "hyprland-git".to_string(),
+            false,
+            String::new(),
+        )
+        .unwrap();
 
-    let client = reqwest::Client::new();
+        let client = reqwest::Client::new();
 
-    group.bench_function("aur_request", |b| {
-        b.iter(|| {
-            rt.block_on(nvrs::run_source(
-                ("hyprland-git".to_string(), mock_package.clone()),
-                client.clone(),
-                None,
-            ))
-        })
-    });
+        group.bench_function("aur_request", |b| {
+            b.iter(|| {
+                rt.block_on(nvrs::run_source(
+                    ("hyprland-git".to_string(), mock_package.clone()),
+                    client.clone(),
+                    None,
+                ))
+            })
+        });
 
-    group.finish();
+        group.finish();
+    }
+}
+
+fn bench_github_requests(c: &mut Criterion) {
+    #[cfg(feature = "github")]
+    {
+        let rt = Runtime::new().unwrap();
+        let mut group = c.benchmark_group("requests");
+
+        let mock_package = nvrs::config::Package::new(
+            "github".to_string(),
+            "orhun/git-cliff".to_string(),
+            false,
+            "v".to_string(),
+        )
+        .unwrap();
+
+        let client = reqwest::Client::new();
+
+        group.bench_function("github_request", |b| {
+            b.iter(|| {
+                rt.block_on(nvrs::run_source(
+                    ("git-cliff".to_string(), mock_package.clone()),
+                    client.clone(),
+                    None,
+                ))
+            })
+        });
+
+        group.finish();
+    }
 }
 
 criterion_group!(
     name = benches;
     config = configure_criterion();
-    targets = bench_config_load, bench_verfile_operations, bench_aur_requests
+    targets = bench_config_load, bench_verfiles, bench_aur_requests, bench_github_requests
 );
 criterion_main!(benches);
