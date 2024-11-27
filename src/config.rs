@@ -71,15 +71,18 @@ impl Package {
     ) -> error::Result<Self> {
         let mut package = Package::default();
 
-        match source.as_ref() {
+        match source.as_str() {
+            #[cfg(feature = "aur")]
             "aur" => {
                 package.aur = target;
                 Ok(())
             }
+            #[cfg(feature = "github")]
             "github" => {
                 package.github = target;
                 Ok(())
             }
+            #[cfg(feature = "gitlab")]
             "gitlab" => {
                 package.gitlab = target;
                 Ok(())
@@ -98,8 +101,11 @@ impl Package {
         Package {
             source: String::new(),
             host: String::new(),
+            #[cfg(feature = "aur")]
             aur: String::new(),
+            #[cfg(feature = "github")]
             github: String::new(),
+            #[cfg(feature = "gitlab")]
             gitlab: String::new(),
             use_max_tag: None,
             prefix: String::new(),
