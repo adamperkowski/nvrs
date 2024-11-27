@@ -1,245 +1,249 @@
-use clap::Parser;
 use colored::Colorize;
-use config::Keyfile;
-use std::sync::Mutex;
-use std::time::{SystemTime, UNIX_EPOCH};
+use nvrs::*;
 
-mod api;
-pub mod config;
-mod verfiles;
-
-lazy_static::lazy_static! {
-    static ref MSG_NOEXIT: Mutex<bool> = Mutex::new(false);
-}
-
-#[derive(Parser)]
-#[command(version, about)]
-struct Cli {
-    #[arg(
-        short = 'c',
-        long,
-        help = "Compare newver with oldver and display differences as updates"
-    )]
-    cmp: bool,
-
-    #[arg(
-        short = 't',
-        long,
-        value_name = "packages",
-        help = "List of packages to update automatically, separated by a comma",
-        value_delimiter = ','
-    )]
-    take: Option<Vec<String>>,
-
-    #[arg(
-        short = 'n',
-        long,
-        value_name = "packages",
-        help = "List of packages to delete from the config",
-        value_delimiter = ','
-    )]
-    nuke: Option<Vec<String>>,
-
-    #[arg(
-        long = "config",
-        value_name = "path",
-        help = "Override path to the config file"
-    )]
-    custom_config: Option<String>,
-
-    #[arg(long, help = "Don't exit the program on recoverable errors")]
-    no_fail: bool,
-
-    #[arg(long, help = "Display copyright information")]
-    copyright: bool,
-}
+mod cli;
 
 #[tokio::main]
-async fn main() {
-    let cli = Cli::parse();
+async fn main() -> error::Result<()> {
+    match init().await {
+        Ok(core) => {
+            let res = if core.1.cmp {
+                compare(core.0).await
+            } else if core.1.take.is_some() {
+                take(core.0, core.1.take).await
+            } else if core.1.nuke.is_some() {
+                nuke(core.0, core.1.nuke, core.1.no_fail).await
+            } else {
+                sync(core.0, core.1.no_fail).await
+            };
 
-    if cli.no_fail {
-        *MSG_NOEXIT.lock().unwrap() = true;
+            match res {
+                Ok(_) => (),
+                Err(e) => pretty_error(&e),
+            }
+        }
+        Err(e) => pretty_error(&e),
     }
 
-    if cli.copyright {
-        let current_year = 1970
-            + (SystemTime::now()
-                .duration_since(UNIX_EPOCH)
-                .expect("time went backwards")
-                .as_secs()
-                / (365 * 24 * 60 * 60));
+    Ok(())
+}
 
-        println!(
-            "Copyright (c) {} Adam Perkowski\n
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the \"Software\"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:\n
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.",
-            current_year
-        );
-    } else if cli.cmp {
-        let (config_content, _, _) = config::load(cli.custom_config);
-        let (oldver, newver) = verfiles::load(config_content.__config__.clone()).unwrap();
+async fn init() -> error::Result<(Core, cli::Cli)> {
+    let cli = cli::get_args();
+    let config = config::load(cli.clone().custom_config).await?;
 
-        for package in newver.data.data {
-            if let Some(pkg) = oldver.data.data.iter().find(|p| p.0 == &package.0) {
-                if pkg.1.version != package.1.version {
+    let verfiles = verfiles::load(config.0.__config__.clone()).await?;
+    let keyfile = keyfile::load(config.0.__config__.clone()).await?;
+
+    Ok((
+        Core {
+            config,
+            verfiles,
+            client: reqwest::Client::new(),
+            keyfile,
+        },
+        cli,
+    ))
+}
+
+async fn compare(core: Core) -> error::Result<()> {
+    let (oldver, newver) = core.verfiles;
+
+    for new_pkg in newver.data.data {
+        if let Some(old_pkg) = oldver.data.data.iter().find(|p| p.0 == &new_pkg.0) {
+            if old_pkg.1.version != new_pkg.1.version {
+                println!(
+                    "{} {} {} -> {}",
+                    "*".white().on_black(),
+                    new_pkg.0.blue(),
+                    old_pkg.1.version.red(),
+                    new_pkg.1.version.blue()
+                );
+            }
+        } else {
+            println!(
+                "{} {} {} -> {}",
+                "*".white().on_black(),
+                new_pkg.0.blue(),
+                "NONE".red(),
+                new_pkg.1.version.green()
+            );
+        }
+    }
+
+    Ok(())
+}
+
+async fn take(core: Core, take_names: Option<Vec<String>>) -> error::Result<()> {
+    let names = take_names.unwrap();
+    let config = core.config;
+    let (mut oldver, newver) = core.verfiles;
+
+    let packages_to_update = if names.contains(&"ALL".to_string()) {
+        newver.data.data.keys().cloned().collect()
+    } else {
+        names
+    };
+
+    for package_name in packages_to_update {
+        if let Some(new_pkg) = newver.data.data.get(&package_name) {
+            if let Some(old_pkg) = oldver.data.data.get_mut(&package_name) {
+                if old_pkg.version != new_pkg.version {
                     println!(
-                        "* {} {} -> {}",
-                        package.0.blue(),
-                        pkg.1.version.red(),
-                        package.1.version.green()
+                        "{} {} {} -> {}",
+                        "+".white().on_black(),
+                        package_name.blue(),
+                        old_pkg.version.red(),
+                        new_pkg.version.green()
                     );
+                    old_pkg.version = new_pkg.version.clone();
+                    old_pkg.gitref = new_pkg.gitref.clone();
+                    old_pkg.url = new_pkg.url.clone();
                 }
             } else {
                 println!(
-                    "* {} {} -> {}",
-                    package.0.blue(),
+                    "{} {} {} -> {}",
+                    "+".white().on_black(),
+                    package_name.blue(),
                     "NONE".red(),
-                    package.1.version.green()
+                    new_pkg.version.green()
                 );
+                oldver.data.data.insert(package_name, new_pkg.clone());
             }
+        } else {
+            return Err(error::Error::PkgNotInNewver(package_name));
         }
-    } else if cli.take.is_some() {
-        let names = cli.take.unwrap();
-        let (config_content, _, _) = config::load(cli.custom_config);
-        let (mut oldver, newver) = verfiles::load(config_content.__config__.clone()).unwrap();
+    }
 
-        for package_name in names {
-            if let Some(package) = newver.data.data.iter().find(|p| p.0 == &package_name) {
-                if let Some(pkg) = oldver.data.data.iter_mut().find(|p| p.0 == &package_name) {
-                    if pkg.1.version != package.1.version {
-                        println!(
-                            "+ {} {} -> {}",
-                            package.0.blue(),
-                            pkg.1.version.red(),
-                            package.1.version.green()
-                        );
+    verfiles::save(oldver, true, config.0.__config__).await
+}
+
+async fn nuke(core: Core, nuke_names: Option<Vec<String>>, no_fail: bool) -> error::Result<()> {
+    let names = nuke_names.unwrap();
+    let mut config_content = core.config.0;
+    let (mut oldver, mut newver) = core.verfiles;
+
+    for package_name in names {
+        if config_content.packages.contains_key(&package_name) {
+            config_content.packages.remove(&package_name);
+        } else if no_fail {
+            pretty_error(&error::Error::PkgNotInConfig(package_name.clone()));
+        } else {
+            return Err(error::Error::PkgNotInConfig(package_name));
+        }
+        newver.data.data.remove(&package_name);
+        oldver.data.data.remove(&package_name);
+    }
+
+    verfiles::save(newver, false, config_content.__config__.clone()).await?;
+    verfiles::save(oldver, true, config_content.__config__.clone()).await?;
+    config::save(config_content, core.config.1).await?;
+
+    Ok(())
+}
+
+async fn sync(core: Core, no_fail: bool) -> error::Result<()> {
+    let config = core.config.0;
+    let (_, mut newver) = core.verfiles;
+
+    let tasks: Vec<_> = config
+        .packages
+        .clone()
+        .into_iter()
+        .map(|pkg| tokio::spawn(run_source(pkg, core.client.clone(), core.keyfile.clone())))
+        .collect();
+
+    let mut results = futures::future::join_all(tasks).await;
+
+    for package in config.packages {
+        match results.remove(0).unwrap() {
+            Ok(release) => {
+                if let Some(new_pkg) = newver.data.data.iter_mut().find(|p| p.0 == &package.0) {
+                    let gitref: String;
+                    let tag = if let Some(t) = release.tag.clone() {
+                        gitref = format!("refs/tags/{}", t);
+                        release.tag.unwrap().replacen(&package.1.prefix, "", 1)
                     } else {
+                        gitref = String::new();
+                        release.name
+                    };
+
+                    if new_pkg.1.version != tag {
                         println!(
-                            "+ {} {} -> {}",
+                            "{} {} {} -> {}",
+                            "|".white().on_black(),
                             package.0.blue(),
-                            pkg.1.version,
-                            package.1.version
+                            new_pkg.1.version.red(),
+                            tag.green()
                         );
+                        new_pkg.1.version = tag.clone();
+                        new_pkg.1.gitref = gitref;
+                        new_pkg.1.url = release.url;
                     }
-                    pkg.1.version = package.1.version.clone();
-                    pkg.1.gitref = package.1.gitref.clone();
-                    pkg.1.url = package.1.url.clone();
                 } else {
+                    let gitref: String;
+                    let tag = if let Some(t) = release.tag.clone() {
+                        gitref = format!("refs/tags/{}", t);
+                        release.tag.unwrap().replacen(&package.1.prefix, "", 1)
+                    } else {
+                        gitref = String::new();
+                        release.name
+                    };
+
                     println!(
-                        "+ {} {} -> {}",
+                        "{} {} {} -> {}",
+                        "|".white().on_black(),
                         package.0.blue(),
                         "NONE".red(),
-                        package.1.version.green()
-                    );
-                    oldver.data.data.insert(package_name, package.1.clone());
-                }
-            } else {
-                custom_error("package not in newver: ", package_name, "noexit");
-            }
-        }
-
-        verfiles::save(oldver, true, config_content.__config__).unwrap();
-    } else if cli.nuke.is_some() {
-        let names = cli.nuke.unwrap();
-        let (mut config_content, config_content_path, _) = config::load(cli.custom_config);
-        let (mut oldver, mut newver) = verfiles::load(config_content.__config__.clone()).unwrap();
-
-        for package_name in names {
-            if config_content.packages.contains_key(&package_name) {
-                config_content.packages.remove(&package_name);
-            } else {
-                custom_error("package not in config: ", package_name.clone(), "noexit");
-            }
-            newver.data.data.remove(&package_name);
-            oldver.data.data.remove(&package_name);
-        }
-
-        verfiles::save(newver, false, config_content.__config__.clone()).unwrap();
-        verfiles::save(oldver, true, config_content.__config__.clone()).unwrap();
-        config::save(config_content, config_content_path).unwrap();
-    } else {
-        let (config_content, _, keyfile) = config::load(cli.custom_config);
-        let (_, mut newver) = verfiles::load(config_content.__config__.clone()).unwrap();
-
-        let tasks: Vec<_> = config_content
-            .packages
-            .clone()
-            .into_iter()
-            .map(|pkg| tokio::spawn(run_source(pkg, keyfile.clone())))
-            .collect();
-
-        let mut results = futures::future::join_all(tasks).await;
-
-        for package in config_content.packages {
-            let release = results.remove(0).unwrap().unwrap();
-            let tag = release.tag_name.replacen(&package.1.prefix, "", 1);
-
-            if let Some(pkg) = newver.data.data.iter_mut().find(|p| p.0 == &package.0) {
-                if pkg.1.version != tag {
-                    println!(
-                        "| {} {} -> {}",
-                        package.0.blue(),
-                        pkg.1.version.red(),
                         tag.green()
                     );
-                    pkg.1.version = tag;
-                    pkg.1.gitref = format!("refs/tags/{}", release.tag_name);
-                    pkg.1.url = release.html_url;
+                    newver.data.data.insert(
+                        package.0,
+                        verfiles::VerPackage {
+                            version: tag.clone(),
+                            gitref,
+                            url: release.url,
+                        },
+                    );
                 }
-            } else {
-                println!("| {} {} -> {}", package.0.blue(), "NONE".red(), tag.green());
-                newver.data.data.insert(
-                    package.0,
-                    verfiles::Package {
-                        version: tag,
-                        gitref: format!("refs/tags/{}", release.tag_name),
-                        url: release.html_url,
-                    },
-                );
             }
-        }
-
-        verfiles::save(newver, false, config_content.__config__).unwrap();
-    }
-}
-
-pub async fn run_source(
-    package: (String, config::Package),
-    keyfile: Option<Keyfile>,
-) -> Option<api::Release> {
-    let source = package.1.source.clone();
-    if let Some(api_used) = api::API_LIST.iter().find(|a| a.name == source) {
-        let api_key = if let Some(k) = keyfile {
-            k.get_api_key(source)
-        } else {
-            String::new()
+            Err(e) => {
+                if !no_fail {
+                    return Err(e);
+                } else {
+                    pretty_error(&e);
+                }
+            }
         };
+    }
 
-        Some(
-            (api_used.func)(
-                package.0,
-                package.1.get_api_arg(api_used.name).unwrap(),
-                api_key,
-            )
-            .await?,
-        )
+    verfiles::save(newver, false, config.__config__).await
+}
+
+fn pretty_error(err: &error::Error) {
+    let mut lines: Vec<String> = err
+        .to_string()
+        .lines()
+        .map(|line| line.to_string())
+        .collect();
+    let first = lines.remove(0);
+    let first_split = first.split_once(':').unwrap_or(("", &first));
+    if first_split.0.is_empty() {
+        println!("{} {}", "!".red().bold().on_black(), first_split.1.red());
     } else {
-        custom_error("api not found: ", source, "");
-        None
+        println!(
+            "{} {}:{}",
+            "!".red().bold().on_black(),
+            first_split.0,
+            first_split.1.red()
+        );
+    }
+    for line in lines {
+        println!("{}  {}", "!".red().on_black(), line)
     }
 }
 
-pub fn custom_error(message: &'static str, message_ext: String, override_exit: &str) {
-    println!("! {}{}", message.red(), message_ext.replace("\n", "\n  "));
-
-    if override_exit != "noexit" && !*MSG_NOEXIT.lock().unwrap() {
-        std::process::exit(1);
-    }
+#[tokio::test]
+async fn core_initializing() {
+    assert!(init().await.is_ok())
 }

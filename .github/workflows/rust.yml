@@ -4,16 +4,19 @@ on:
     branches: ["main"]
     paths:
       - '**/*.rs'
-      - 'src/**'
+      - 'src/**/*'
       - 'Cargo.toml'
       - 'Cargo.lock'
   pull_request:
     paths:
       - '**/*.rs'
-      - 'src/**'
+      - 'src/**/*'
       - 'Cargo.toml'
       - 'Cargo.lock'
   workflow_dispatch:
+
+env:
+  CARGO_TERM_COLOR: always
 
 jobs:
   check:
@@ -45,3 +48,16 @@ jobs:
           cargo build --verbose
           cargo build --release --verbose
 
+  test:
+    runs-on: ubuntu-latest
+    needs: build
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Test
+        run: |
+          cargo test --lib
+          cargo test --lib --release
+          cargo test --doc
+          cargo test --doc --release

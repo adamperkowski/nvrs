@@ -1,74 +1,87 @@
-use reqwest::{
-    header::{HeaderMap, HeaderName, HeaderValue, USER_AGENT},
-    StatusCode,
-};
+use crate::{api, error};
+use reqwest::{header::HeaderValue, Response};
 use serde_json::Value;
 
-pub fn get_latest(package: String, args: Vec<String>, key: String) -> crate::api::ReleaseFuture {
+#[derive(serde::Deserialize)]
+struct GitLabResponse {
+    tag_name: String,
+    tag_path: String,
+}
+
+pub fn get_latest(args: api::ApiArgs) -> api::ReleaseFuture {
     Box::pin(async move {
-        let url = if !args[1].is_empty() {
-            format!(
-                "https://{}/api/v4/projects/{}/releases/permalink/latest",
-                args[1],
-                args[0].replace("/", "%2F")
-            )
+        let host = if !args.args[1].is_empty() {
+            &args.args[1]
         } else {
-            format!(
-                "https://gitlab.com/api/v4/projects/{}/releases/permalink/latest",
-                args[0].replace("/", "%2F")
-            )
+            "gitlab.com"
         };
+        let repo_url = format!(
+            "https://{}/api/v4/projects/{}",
+            host,
+            args.args[0].replace("/", "%2F")
+        );
 
-        let result = request(url, package, key).await.unwrap();
-        let r_json: Value = result.json().await.unwrap();
+        if args.use_max_tag.is_some_and(|x| x) {
+            let url = format!("{}/repository/tags", repo_url);
+            let result = request(url, &args).await?;
+            let json: Value = result.json().await?;
 
-        Some(crate::api::Release {
-            tag_name: r_json
-                .get("tag_name")
+            let max_tag = json
+                .get(0)
+                .unwrap()
+                .get("name")
                 .unwrap()
                 .to_string()
-                .replace("\"", ""),
-            html_url: r_json
-                .get("_links")
-                .unwrap()
-                .get("self")
-                .unwrap()
-                .to_string()
-                .replace("\"", ""),
-        })
+                .replace("\"", "");
+
+            Ok(api::Release {
+                name: max_tag.clone(),
+                tag: Some(max_tag.clone()),
+                url: format!("https://{}/{}/-/tags/{}", host, args.args[0], max_tag),
+            })
+        } else {
+            let url = format!("{}/releases/permalink/latest", repo_url);
+            let result = request(url, &args).await?;
+            let json: GitLabResponse = result.json().await?;
+
+            Ok(api::Release {
+                name: json.tag_name.clone(),
+                tag: Some(json.tag_name),
+                url: format!("https://{}{}", host, json.tag_path),
+            })
+        }
     })
 }
 
-async fn request(url: String, package: String, key: String) -> Option<reqwest::Response> {
-    let mut headers = HeaderMap::new();
-    headers.insert(USER_AGENT, HeaderValue::from_static("nvrs"));
-    if !key.is_empty() {
+async fn request(url: String, args: &api::ApiArgs) -> error::Result<Response> {
+    let mut headers = api::setup_headers();
+    if !args.api_key.is_empty() {
         headers.insert(
-            HeaderName::from_static("PRIVATE-TOKEN"),
-            HeaderValue::from_str(key.as_str()).unwrap(),
+            "PRIVATE-TOKEN",
+            HeaderValue::from_str(&args.api_key).unwrap(),
         );
-    }
-    let client = reqwest::Client::new();
+    };
+    let client = &args.request_client;
 
-    let result = client.get(url).headers(headers).send().await.unwrap();
+    let result = client.get(url).headers(headers).send().await?;
+    api::match_statuscode(&result.status(), args.package.clone())?;
 
-    match result.status() {
-        StatusCode::OK => Some(result),
-        StatusCode::FORBIDDEN => {
-            crate::custom_error(
-                "GET request returned 430: ",
-                format!("{}\nwe might be getting rate-limited here", package),
-                "",
-            );
-            None
-        }
-        status => {
-            crate::custom_error(
-                "GET request didn't return 200: ",
-                format!("{}\n{}", package, status),
-                "",
-            );
-            None
-        }
-    }
+    Ok(result)
+}
+
+#[tokio::test]
+async fn request_test() {
+    let package = "mkinitcpio".to_string();
+    let args = api::ApiArgs {
+        request_client: reqwest::Client::new(),
+        package: package.clone(),
+        use_max_tag: None,
+        args: vec![
+            format!("archlinux/{0}/{0}", package),
+            "gitlab.archlinux.org".to_string(),
+        ],
+        api_key: String::new(),
+    };
+
+    assert!(get_latest(args).await.is_ok());
 }

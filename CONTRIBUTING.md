@@ -2,6 +2,8 @@
 
 Thank you for considering contributing to [nvrs](https://github.com/adamperkowski/nvrs) ❤️
 
+If, while viewing the code, you find any parts unclear or unexplained, please [open an issue](https://github.com/adamperkowski/nvrs/issues/new/choose) with a documentation request.
+
 Note that we have a [Code of Conduct](./CODE_OF_CONDUCT.md). Please follow it in all your interactions with the project.
 
 ## Workflow

@@ -1,87 +1,19 @@
+//! operations on configuration files
+//!
+//! see the [example `nvrs.toml`](https://github.com/adamperkowski/nvrs/blob/main/nvrs.toml)
+
+use crate::error;
 use serde::{Deserialize, Serialize};
 use std::{
     collections::BTreeMap,
-    env, fs,
-    io::Write,
+    env,
     path::{Path, PathBuf},
 };
+use tokio::{fs, io::AsyncWriteExt};
 
-#[derive(Debug, Clone, Deserialize)]
-struct KeysTable {
-    #[cfg(feature = "github")]
-    #[serde(default)]
-    #[serde(skip_serializing_if = "is_empty_string")]
-    pub github: String,
-    #[cfg(feature = "gitlab")]
-    #[serde(default)]
-    #[serde(skip_serializing_if = "is_empty_string")]
-    pub gitlab: String,
-}
-
-#[derive(Debug, Clone, Deserialize)]
-pub struct Keyfile {
-    keys: KeysTable,
-}
-
-impl Keyfile {
-    pub fn get_api_key(&self, api_name: String) -> String {
-        match api_name.as_str() {
-            "github" => self.keys.github.clone(),
-            "gitlab" => self.keys.gitlab.clone(),
-            _ => String::new(),
-        }
-    }
-}
-
-#[derive(Debug, Clone, Deserialize, Serialize)]
-pub struct ConfigTable {
-    pub oldver: Option<String>,
-    pub newver: Option<String>,
-    keyfile: Option<String>,
-    /* proxy: Option<String>,
-    max_concurrency: Option<String>,
-    http_timeout: Option<String>, */
-}
-
-#[derive(Debug, Clone, Deserialize, Serialize)]
-pub struct Package {
-    pub source: String,
-    #[serde(default)]
-    #[serde(skip_serializing_if = "is_empty_string")]
-    pub host: String,
-
-    #[cfg(feature = "aur")]
-    #[serde(default)]
-    #[serde(skip_serializing_if = "is_empty_string")]
-    pub aur: String,
-    #[cfg(feature = "github")]
-    #[serde(default)]
-    #[serde(skip_serializing_if = "is_empty_string")]
-    pub github: String,
-    #[cfg(feature = "gitlab")]
-    #[serde(default)]
-    #[serde(skip_serializing_if = "is_empty_string")]
-    pub gitlab: String,
-
-    #[serde(default)]
-    #[serde(skip_serializing_if = "is_empty_string")]
-    pub prefix: String,
-}
-
-impl Package {
-    pub fn get_api_arg(&self, api_name: &str) -> Option<Vec<String>> {
-        match api_name {
-            #[cfg(feature = "aur")]
-            "aur" => Some(vec![self.aur.clone()]),
-            #[cfg(feature = "github")]
-            "github" => Some(vec![self.github.clone()]),
-            #[cfg(feature = "gitlab")]
-            "gitlab" => Some(vec![self.gitlab.clone(), self.host.clone()]),
-            _ => None,
-        }
-    }
-}
-
+/// main configuration file structure
+///
+/// see the [example `nvrs.toml`](https://github.com/adamperkowski/nvrs/blob/main/nvrs.toml)
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct Config {
     pub __config__: Option<ConfigTable>,
@@ -89,22 +21,126 @@ pub struct Config {
     pub packages: BTreeMap<String, Package>,
 }
 
-pub fn load(custom_path: Option<String>) -> (Config, PathBuf, Option<Keyfile>) {
-    if custom_path.is_some() {
-        let custom_path = custom_path.unwrap();
-        let config_path = Path::new(&custom_path);
-        if config_path.exists() && config_path.is_file() {
-            let content = fs::read_to_string(config_path).unwrap_or_default();
-            let toml_content: Config =
-                toml::from_str(&content).expect("failed to read the config file");
+/// `__config__` table structure
+///
+/// see the [example `nvrs.toml`](https://github.com/adamperkowski/nvrs/blob/main/nvrs.toml)
+#[derive(Debug, Clone, Deserialize, Serialize)]
+pub struct ConfigTable {
+    pub oldver: Option<String>,
+    pub newver: Option<String>,
+    pub keyfile: Option<String>,
+}
 
-            return (
-                toml_content.clone(),
-                PathBuf::from(config_path),
-                load_keyfile(&toml_content),
-            );
+/// package entry structure
+///
+/// see the [example `nvrs.toml`](https://github.com/adamperkowski/nvrs/blob/main/nvrs.toml)
+#[derive(Debug, Clone, Deserialize, Serialize)]
+pub struct Package {
+    source: String, // ex. "github", "aur"
+    #[serde(default)]
+    #[serde(skip_serializing_if = "is_empty_string")]
+    host: String, // ex. "gitlab.archlinux.org"
+
+    // equivalent to `target` in api::ApiArgs
+    #[cfg(feature = "aur")]
+    #[serde(default)]
+    #[serde(skip_serializing_if = "is_empty_string")]
+    aur: String,
+    #[cfg(feature = "github")]
+    #[serde(default)]
+    #[serde(skip_serializing_if = "is_empty_string")]
+    github: String,
+    #[cfg(feature = "gitlab")]
+    #[serde(default)]
+    #[serde(skip_serializing_if = "is_empty_string")]
+    gitlab: String,
+
+    #[serde(default)]
+    pub use_max_tag: Option<bool>,
+    #[serde(default)]
+    #[serde(skip_serializing_if = "is_empty_string")]
+    pub prefix: String,
+}
+
+impl Package {
+    pub fn new(
+        source: String,
+        target: String,
+        use_max_tag: bool,
+        prefix: String,
+    ) -> error::Result<Self> {
+        let mut package = Package::default();
+
+        match source.as_ref() {
+            "aur" => {
+                package.aur = target;
+                Ok(())
+            }
+            "github" => {
+                package.github = target;
+                Ok(())
+            }
+            "gitlab" => {
+                package.gitlab = target;
+                Ok(())
+            }
+            _ => Err(error::Error::SourceNotFound(source.clone())),
+        }?;
+
+        package.source = source;
+        package.use_max_tag = Some(use_max_tag);
+        package.prefix = prefix;
+
+        Ok(package)
+    }
+
+    fn default() -> Self {
+        Package {
+            source: String::new(),
+            host: String::new(),
+            aur: String::new(),
+            github: String::new(),
+            gitlab: String::new(),
+            use_max_tag: None,
+            prefix: String::new(),
+        }
+    }
+
+    /// global function to get various API-specific agrs for a package
+    ///
+    /// # example
+    /// ```rust,ignore
+    /// // package has `source = "github"` * `github = "adamperkowski/nvrs"` specified
+    /// let args = package.get_api();
+    ///
+    /// assert_eq!(package, ("github", vec!["adamperkowski/nvrs"]))
+    /// ```
+    pub fn get_api(&self) -> (String, Vec<String>) {
+        let args = match self.source.as_str() {
+            #[cfg(feature = "aur")]
+            "aur" => vec![self.aur.clone()],
+            #[cfg(feature = "github")]
+            "github" => vec![self.github.clone()],
+            #[cfg(feature = "gitlab")]
+            "gitlab" => vec![self.gitlab.clone(), self.host.clone()],
+            _ => vec![],
+        };
+
+        (self.source.clone(), args)
+    }
+}
+
+/// global asynchronous function to load all config files
+pub async fn load(custom_path: Option<String>) -> error::Result<(Config, PathBuf)> {
+    if let Some(path) = custom_path {
+        let config_path = Path::new(&path);
+        if config_path.exists() && config_path.is_file() {
+            let content = fs::read_to_string(config_path).await?;
+            let toml_content: Config = toml::from_str(&content)?;
+
+            return Ok((toml_content, PathBuf::from(config_path)));
         } else {
-            crate::custom_error("specified config file not found", String::new(), "");
+            return Err(error::Error::NoConfigSpecified);
         }
     }
 
@@ -120,14 +156,14 @@ pub fn load(custom_path: Option<String>) -> (Config, PathBuf, Option<Keyfile>) {
     );
     let config_home_path = Path::new(&config_home);
 
-    let (content, path_actual) = if config_path.exists() && config_path.is_file() {
+    let (content, path_final) = if config_path.exists() && config_path.is_file() {
         (
-            fs::read_to_string(config_path).unwrap_or_default(),
+            fs::read_to_string(config_path).await?,
             PathBuf::from(config_path),
         )
     } else if config_home_path.exists() && config_home_path.is_file() {
         (
-            fs::read_to_string(config_home_path).unwrap_or_default(),
+            fs::read_to_string(config_home_path).await?,
             PathBuf::from(config_home_path),
         )
     } else {
@@ -135,51 +171,51 @@ pub fn load(custom_path: Option<String>) -> (Config, PathBuf, Option<Keyfile>) {
     };
 
     if content.is_empty() {
-        crate::custom_error(
-            "no config found",
-            "\nconfig file locations:\n ~/.config/nvrs.toml\n ./nvrs.toml\nmake sure the file is not empty".to_string(),
-         "");
+        return Err(error::Error::NoConfig);
     }
 
-    let toml_content: Config = toml::from_str(&content).expect("error reading the config file");
-
-    let keyfile = load_keyfile(&toml_content);
-    (toml_content, path_actual, keyfile)
+    Ok((toml::from_str(&content)?, path_final))
 }
 
-fn load_keyfile(toml_content: &Config) -> Option<Keyfile> {
-    if let Some(ref config_content) = toml_content.__config__ {
-        if let Some(ref keyfile) = config_content.keyfile {
-            let keyfile_path = Path::new(keyfile);
-            let keyfile_content = if keyfile_path.exists() && keyfile_path.is_file() {
-                fs::read_to_string(keyfile_path).unwrap_or_default()
-            } else {
-                String::new()
-            };
+// FIXME: this nukes all the comments
+/// global asynchronous function to save the config file
+pub async fn save(config_content: Config, path: PathBuf) -> error::Result<()> {
+    let mut file = fs::File::create(path).await?;
+    let content = format!("{}\n", toml::to_string(&config_content)?);
+    file.write_all(content.as_bytes()).await?;
+    Ok(())
+}
 
-            if keyfile_content.is_empty() {
-                crate::custom_error(
-                    "keyfile not found",
-                    "\nmake sure the file is not empty".to_string(),
-                    "exit",
-                );
-            }
+fn is_empty_string(s: &str) -> bool {
+    s.is_empty()
+}
 
-            Some(toml::from_str(&keyfile_content).expect("error reading the keyfile"))
-        } else {
-            None
-        }
-    } else {
-        None
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[tokio::test]
+    async fn loading() {
+        let config = load(None).await.unwrap();
+
+        assert_eq!(config.1, PathBuf::from("nvrs.toml"));
     }
-}
 
-pub fn save(config_content: Config, path: PathBuf) -> Result<(), std::io::Error> {
-    let mut file = fs::File::create(path).unwrap();
-    let content = format!("{}\n", toml::to_string(&config_content).unwrap());
-    file.write_all(content.as_bytes())
-}
-
-fn is_empty_string(value: &str) -> bool {
-    value.is_empty()
+    #[tokio::test]
+    async fn manual_package() {
+        assert!(Package::new(
+            "non_existing_source".to_string(),
+            "non_existing".to_string(),
+            false,
+            String::new()
+        )
+        .is_err());
+        assert!(Package::new(
+            "github".to_string(),
+            "orhun/git-cliff".to_string(),
+            false,
+            "v".to_string()
+        )
+        .is_ok());
+    }
 }

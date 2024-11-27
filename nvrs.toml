@@ -1,6 +1,9 @@
 # nvrs
 # https://github.com/adamperkowski/nvrs
 
+# this is an example configuration file for nvrs
+# use `use_latest_release = true` for maximum nvchecker compatibility
+
 [__config__]
 oldver = "oldver.json"
 newver = "newver.json"
@@ -11,12 +14,17 @@ source = "github"
 github = "hyprutils/hyprgui"
 prefix = "v"
 
+[hyprwall]
+source = "aur"
+aur = "hyprwall"
+
 [mkinitcpio]
 source = "gitlab"
 host = "gitlab.archlinux.org"
 gitlab = "archlinux/mkinitcpio/mkinitcpio"
 prefix = "v"
 
-[hyprwall]
-source = "aur"
-aur = "hyprwall"
+[rustup]
+source = "github"
+github = "rust-lang/rustup"
+use_max_tag = true

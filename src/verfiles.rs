@@ -1,22 +1,29 @@
+//! operations on version files
+//!
+//! see `newver` & `oldver` in [crate::config::ConfigTable]
+
 use serde::{Deserialize, Serialize};
-use std::{collections::BTreeMap, fs, io::Write, path::Path};
+use std::{collections::BTreeMap, path::Path};
+use tokio::{fs, io::AsyncWriteExt};
 
-use crate::config::ConfigTable;
+use crate::{config, error};
 
+// verfiles get created from this
 const TEMPLATE: &str = r#"{
   "version": 2,
   "data": {}
 }
 "#;
 
-const CONFIG_NONE_M: &str = "__config__ not specified\nexample:";
-const XVER_NONE_M: &str = "oldver & newver not specified\nexample:";
-const CONFIG_NONE_E: &str = "\n[__config__]
-oldver = \"oldver.json\"
-newver = \"newver.json\"";
+/// main data structure
+#[derive(Serialize, Deserialize)]
+pub struct VerData {
+    pub data: BTreeMap<String, VerPackage>,
+}
 
+/// package entry structure
 #[derive(Clone, Serialize, Deserialize)]
-pub struct Package {
+pub struct VerPackage {
     pub version: String,
     #[serde(default)]
     pub gitref: String,
@@ -24,68 +31,62 @@ pub struct Package {
     pub url: String,
 }
 
-#[derive(Clone, Serialize, Deserialize)]
-pub struct Data {
-    pub data: BTreeMap<String, Package>,
-}
-
-#[derive(Clone, Serialize, Deserialize)]
+/// file structure
+#[derive(Serialize, Deserialize)]
 pub struct Verfile {
     version: u8,
     #[serde(flatten)]
-    pub data: Data,
+    pub data: VerData,
 }
 
-pub fn load(config_table: Option<ConfigTable>) -> Option<(Verfile, Verfile)> {
+/// load the verfiles specified in [crate::config::ConfigTable]
+pub async fn load(config_table: Option<config::ConfigTable>) -> error::Result<(Verfile, Verfile)> {
     if config_table.is_none() {
-        crate::custom_error(CONFIG_NONE_M, CONFIG_NONE_E.to_string(), "");
+        return Err(error::Error::NoConfigTable);
     }
     let config_table = config_table.unwrap();
 
     if config_table.oldver.is_some() && config_table.newver.is_some() {
-        let oldver_path = Path::new(config_table.oldver.as_ref().unwrap());
-        let newver_path = Path::new(config_table.newver.as_ref().unwrap());
-        let oldver = load_file(oldver_path);
-        let newver = load_file(newver_path);
+        let oldver = load_file(Path::new(config_table.oldver.as_ref().unwrap())).await?;
+        let newver = load_file(Path::new(config_table.newver.as_ref().unwrap())).await?;
 
         if oldver.version != 2 || newver.version != 2 {
-            crate::custom_error(
-                "unsupported verfile version",
-                "\nplease update your verfiles".to_string(),
-                "",
-            );
+            return Err(error::Error::VerfileVer);
         }
 
-        Some((oldver, newver))
+        Ok((oldver, newver))
     } else {
-        crate::custom_error(XVER_NONE_M, CONFIG_NONE_E.to_string(), "");
-        None
+        Err(error::Error::NoXVer)
     }
 }
 
-pub fn save(
+/// save changes to the verfiles
+pub async fn save(
     verfile: Verfile,
-    oldver: bool,
-    config_table: Option<ConfigTable>,
-) -> Result<(), std::io::Error> {
+    is_oldver: bool,
+    config_table: Option<config::ConfigTable>,
+) -> error::Result<()> {
     let config_table = config_table.unwrap();
-    let path = if oldver {
+    let path = if is_oldver {
         Path::new(config_table.oldver.as_ref().unwrap())
     } else {
         Path::new(config_table.newver.as_ref().unwrap())
     };
 
-    let mut file = fs::File::create(path).unwrap();
-    let content = format!("{}\n", serde_json::to_string_pretty(&verfile).unwrap());
-    file.write_all(content.as_bytes())
+    let mut file = fs::File::create(path).await?;
+    let content = format!("{}\n", serde_json::to_string_pretty(&verfile)?);
+
+    Ok(file.write_all(content.as_bytes()).await?)
 }
 
-fn load_file(path: &Path) -> Verfile {
+async fn load_file(path: &Path) -> error::Result<Verfile> {
     if !path.exists() {
-        let mut file = fs::File::create(path).unwrap();
-        file.write_all(TEMPLATE.as_bytes()).unwrap();
+        let mut file = fs::File::create(path).await?;
+        file.write_all(TEMPLATE.as_bytes()).await?;
     }
-    let content = fs::read_to_string(path).unwrap();
+    let content = fs::read_to_string(path).await?;
 
-    serde_json::from_str(&content).expect("failed to read oldver")
+    Ok(serde_json::from_str(&content)?)
 }
+
+// TODO: tests

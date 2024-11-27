@@ -1,40 +1,50 @@
-use reqwest::{
-    header::{HeaderMap, HeaderValue, USER_AGENT},
-    StatusCode,
-};
+use crate::{api, error};
 
-pub fn get_latest(package: String, _: Vec<String>, _: String) -> crate::api::ReleaseFuture {
+#[derive(serde::Deserialize)]
+struct AURResponse {
+    results: Vec<AURResult>,
+}
+
+#[allow(non_snake_case)]
+#[derive(serde::Deserialize)]
+struct AURResult {
+    Version: String,
+}
+
+pub fn get_latest(args: api::ApiArgs) -> api::ReleaseFuture {
     Box::pin(async move {
-        let url = format!("https://aur.archlinux.org/rpc/v5/info/{}", package);
-        let mut headers = HeaderMap::new();
-        headers.insert(USER_AGENT, HeaderValue::from_static("nvrs"));
-        let client = reqwest::Client::new();
+        let url = format!("https://aur.archlinux.org/rpc/v5/info/{}", args.args[0]);
+        let client = args.request_client;
 
-        let result = client.get(url).headers(headers).send().await.unwrap();
+        let result = client.get(url).headers(api::setup_headers()).send().await?;
+        api::match_statuscode(&result.status(), args.package.clone())?;
 
-        match result.status() {
-            StatusCode::OK => (),
-            status => {
-                crate::custom_error("GET request didn't return 200", format!("\n{}", status), "");
-                return None;
-            }
+        let json: AURResponse = result.json().await?;
+
+        if let Some(first) = json.results.first() {
+            let version = first.Version.split_once('-').unwrap();
+
+            Ok(api::Release {
+                name: version.0.to_string(),
+                tag: None,
+                url: String::new(),
+            })
+        } else {
+            Err(error::Error::NoVersion(args.package))
         }
-
-        let json: serde_json::Value = result.json().await.unwrap();
-        let first_result = json.get("results").unwrap().get(0).unwrap();
-
-        Some(crate::api::Release {
-            tag_name: first_result
-                .get("Version")
-                .and_then(|v| v.as_str())
-                .and_then(|s| s.split('-').next())
-                .unwrap_or("")
-                .to_string(),
-            html_url: first_result
-                .get("URL")
-                .unwrap()
-                .to_string()
-                .replace("\"", ""),
-        })
     })
+}
+
+#[tokio::test]
+async fn request_test() {
+    let package = "permitter".to_string();
+    let args = api::ApiArgs {
+        request_client: reqwest::Client::new(),
+        package: package.clone(),
+        use_max_tag: None,
+        args: vec![package],
+        api_key: String::new(),
+    };
+
+    assert!(get_latest(args).await.is_ok());
 }
