@@ -2,6 +2,20 @@
 
 All notable changes to nvrs will be documented in this file.
 
+## [0.1.5-pre1] - 2024-11-27
+
+### 🚀 Features
+
+- `use_max_tag` functionality ([8431412](https://github.com/adamperkowski/nvrs/commit/843141248520b7a784cae15c0571cd23e68d277e))
+
+### 🐛 Bug Fixes
+
+- (*ui*) `sync` errors displayed twice when no `--no-fail` ([8d7e341](https://github.com/adamperkowski/nvrs/commit/8d7e3413e258ac1b1a38256de10f02d8f078d68d))
+
+### 📚 Documentation
+
+- (*README*) add installation & usage instructions ([cd0bd72](https://github.com/adamperkowski/nvrs/commit/cd0bd7269f35ccb559f81abfda62c69ae06bce79))
+
 ## [0.1.4] - 2024-11-25
 
 ### 🚀 Features
