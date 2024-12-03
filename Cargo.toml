@@ -1,6 +1,6 @@
 [package]
 name = "nvrs"
-version = "0.1.5"
+version = "0.1.6-pre1"
 authors = ["Adam Perkowski <adas1per@protonmail.com>"]
 license = "MIT"
 description = "🚦 fast new version checker for software releases 🦀"
@@ -21,6 +21,7 @@ include = [
 
 [features]
 nvrs_cli = ["clap", "colored", "futures"]
+nvrs_tui = []
 default = ["aur", "github", "gitlab"]
 aur = []
 github = []
