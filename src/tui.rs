@@ -1,7 +1,10 @@
 use anyhow::Result;
-use crossterm::{event::{self, Event, KeyCode, KeyEvent, KeyEventKind}};
+use crossterm::event::{self, Event, KeyCode, KeyEvent, KeyEventKind};
 use ratatui::{
-    layout::Alignment, style::Color, widgets::{Block, BorderType, Borders}, Frame
+    layout::Alignment,
+    style::Color,
+    widgets::{Block, BorderType, Borders},
+    Frame,
 };
 use tachyonfx::{fx, Duration as FxDuration, Effect, EffectRenderer, Shader};
 
@@ -12,12 +15,16 @@ struct AppState {
 
 impl AppState {
     async fn new() -> Result<Self> {
-        Ok(Self { is_running: true, effect: fx::fade_to_fg(Color::White, FxDuration::from_millis(500)) })
+        Ok(Self {
+            is_running: true,
+            effect: fx::fade_to_fg(Color::White, FxDuration::from_millis(500)),
+        })
     }
 
     fn draw(&mut self, frame: &mut Frame) {
         let block = Block::default()
-            .title(" nvrs ").title_alignment(Alignment::Center)
+            .title(" nvrs ")
+            .title_alignment(Alignment::Center)
             .borders(Borders::ALL)
             .border_type(BorderType::Rounded);
 
