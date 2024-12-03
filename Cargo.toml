@@ -37,7 +37,7 @@ path = "src/tui.rs"
 required-features = ["nvrs_tui"]
 
 [dependencies]
-clap = { version = "4.5.21", features = ["derive", "color", "error-context", "help", "std", "usage"], default-features = false , optional = true }
+clap = { version = "4.5.22", features = ["derive", "color", "error-context", "help", "std", "usage"], default-features = false , optional = true }
 colored = { version = "2.1.0", optional = true }
 futures = { version = "0.3.31", optional = true }
 reqwest = { version = "0.12.9", features = ["__tls", "charset", "default-tls", "h2", "http2", "json"], default-features = false }
