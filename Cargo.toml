@@ -44,7 +44,7 @@ reqwest = { version = "0.12.9", features = ["__tls", "charset", "default-tls", "
 serde = { version = "1.0.215", features = ["derive"], default-features = false }
 serde_json = "1.0.132"
 thiserror = "2.0.3"
-tokio = { version = "1.41.1", features = ["full"] }
+tokio = { version = "1.42.0", features = ["full"] }
 toml = { version = "0.8.19", features = ["parse", "display"], default-features = false }
 
 [dev-dependencies]
