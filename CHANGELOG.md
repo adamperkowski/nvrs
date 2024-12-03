@@ -2,11 +2,16 @@
 
 All notable changes to nvrs will be documented in this file.
 
-## [upstream]
+## [0.1.6-pre1] - 2024-12-03
+
+### 🚀 Features
+
+- `--list-sources` command ([442c06f](https://github.com/adamperkowski/nvrs/commit/442c06f0e56f4adcc0c2ad44d042997cb088a930))
 
 ### ⚙️ Refactoring
 
 - (*verfiles, config*) saving & loading improvements ([81d7efd](https://github.com/adamperkowski/nvrs/commit/81d7efd24b9b425f59bec1cdbb588bc25ed433cb))
+- split features & binaries ([4acd98e](https://github.com/adamperkowski/nvrs/commit/4acd98e5d2c5df0845c6bd512cb40f705da9361e))
 
 ### 📚 Documentation
 
