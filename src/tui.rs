@@ -85,7 +85,7 @@ impl AppState {
         let mut new_items: Vec<Line> = Vec::with_capacity(new_data.len());
         let mut old_items: Vec<Line> = Vec::with_capacity(old_data.len());
 
-        for new in new_data.iter() {
+        for (index, new) in new_data.iter().enumerate() {
             if !self.search_input.is_empty() {
                 let search = self.search_input.iter().collect::<String>();
                 if !new.0.contains(&search) {
@@ -111,11 +111,18 @@ impl AppState {
 
             let name = format!("{} ", new.0);
 
+            let selected_style = if Some(index) == self.list_state.selected() {
+                Style::new().bg(Color::DarkGray)
+            } else {
+                Style::default()
+            };
+
             let new_line = Line::from_iter([
                 PACKAGE_ICON.into(),
                 Span::styled(name.clone(), blue),
                 Span::styled(new.1.version.clone(), style.0),
-            ]);
+            ])
+            .style(selected_style);
 
             let old_line = if let Some(old) = old {
                 Line::from_iter([
@@ -123,11 +130,13 @@ impl AppState {
                     Span::styled(name, blue),
                     Span::styled(old.1.version.clone(), style.1),
                 ])
+                .style(selected_style)
             } else {
                 Line::from_iter([
                     PACKAGE_ICON.into(),
                     Span::styled("NONE", Style::new().fg(Color::Red)),
                 ])
+                .style(selected_style)
             };
 
             if self.filter_updated && !display {
@@ -179,7 +188,9 @@ impl AppState {
                 .title_bottom(if self.is_searching {
                     KEYBINDS_SEARCH
                 } else {
-                    KEYBINDS
+                    self.list_state
+                        .selected()
+                        .map_or(KEYBINDS, |_| KEYBINDS_SELECTED)
                 })
                 .title_alignment(ratatui::layout::Alignment::Center)
                 .border_type(BorderType::Rounded),
@@ -254,7 +265,10 @@ impl AppState {
                 KeyCode::Backspace => {
                     self.search_input.pop();
                 }
-                KeyCode::Enter => self.is_searching = false,
+                KeyCode::Enter => {
+                    self.list_state.select(Some(0));
+                    self.is_searching = false;
+                }
                 KeyCode::Char(c) => self.search_input.push(c),
                 _ => {}
             }
