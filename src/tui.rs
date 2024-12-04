@@ -10,7 +10,9 @@ use ratatui::{
 };
 use tachyonfx::{fx, Duration as FxDuration, Effect, EffectRenderer, Shader};
 
-const KEYBINDS: &str = " [q] quit  [s] sync  [f] filter updated  [/] search ";
+const KEYBINDS: &str = " [q]uit  [s]ync  [f]ilter updated  [/] search ";
+const KEYBINDS_SELECTED: &str =
+    " [q]uit  [s]ync  [enter] take  [n]uke  [f]ilter updated  [/] search ";
 const KEYBINDS_SEARCH: &str = " [esc] cancel  [enter] search ";
 
 const PACKAGE_ICON: &str = " ";
@@ -116,7 +118,10 @@ impl AppState {
                     Span::styled(old.1.version.clone(), style.1),
                 ])
             } else {
-                Line::from_iter([PACKAGE_ICON.into(), Span::styled("NONE", Style::new().fg(Color::Red))])
+                Line::from_iter([
+                    PACKAGE_ICON.into(),
+                    Span::styled("NONE", Style::new().fg(Color::Red)),
+                ])
             };
 
             if self.filter_updated && !display {
@@ -147,6 +152,10 @@ impl AppState {
     fn draw_searchbar(&self, frame: &mut Frame, area: Rect) {
         let title = if self.is_syncing {
             " synchronizing... "
+        } else if !self.search_input.is_empty() {
+            " search "
+        } else if self.filter_updated {
+            " filtered "
         } else {
             " nvrs "
         };
