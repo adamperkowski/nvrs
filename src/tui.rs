@@ -3,10 +3,13 @@ use crossterm::event::{self, Event, KeyCode, KeyEvent, KeyEventKind};
 use nvrs::*;
 use ratatui::{
     layout::Alignment,
+    style::{Style, Stylize},
     widgets::{Block, BorderType, List, ListItem},
     Frame,
 };
 use tachyonfx::{fx, Duration as FxDuration, Effect, EffectRenderer, Shader};
+
+const KEYBINDS: &str = " [q] Quit  [s] Sync ";
 
 struct AppState {
     is_running: bool,
@@ -42,13 +45,19 @@ impl AppState {
     fn draw(&mut self, frame: &mut Frame) {
         let new_names = self.verfiles.1.data.data.keys().collect::<Vec<_>>();
 
-        let list = List::new(new_names.iter().map(|p| ListItem::new(p.to_string()))).block(
+        let list = List::new(
+            new_names
+                .iter()
+                .map(|p| ListItem::new(format!("📦️ {}", p)).style(Style::default().blue())),
+        )
+        .block(
             Block::bordered()
-                .title(if self.is_syncing {
+                .title_top(if self.is_syncing {
                     " Synchronizing... "
                 } else {
                     " nvrs "
                 })
+                .title_bottom(KEYBINDS)
                 .title_alignment(Alignment::Center)
                 .border_type(BorderType::Rounded),
         );
