@@ -2,21 +2,25 @@ use anyhow::Result;
 use crossterm::event::{self, Event, KeyCode, KeyEvent, KeyEventKind};
 use nvrs::*;
 use ratatui::{
-    layout::{Constraint, Layout},
+    layout::{Constraint, Layout, Rect},
     style::{Color, Style},
     text::{Line, Span},
-    widgets::{Block, BorderType, List},
+    widgets::{Block, BorderType, List, Paragraph},
     Frame,
 };
 use tachyonfx::{fx, Duration as FxDuration, Effect, EffectRenderer, Shader};
 
-const KEYBINDS: &str = " [q] Quit  [s] Sync ";
+const KEYBINDS: &str = " [q] quit  [s] sync  [f] filter updated  [/] search ";
+const KEYBINDS_SEARCH: &str = " [esc] cancel  [enter] search ";
 
 struct AppState {
     is_running: bool,
     is_syncing: bool,
     is_comparing: bool,
+    filter_updated: bool,
     effect: Effect,
+    search_input: Vec<char>,
+    is_searching: bool,
 
     // nvrs data
     config: (config::Config, std::path::PathBuf),
@@ -35,7 +39,10 @@ impl AppState {
             is_running: true,
             is_syncing: false,
             is_comparing: true,
+            filter_updated: false,
             effect: fx::coalesce(800),
+            search_input: Vec::new(),
+            is_searching: false,
 
             // nvrs data
             config,
@@ -56,14 +63,11 @@ impl AppState {
     }
 
     fn draw_compare(&mut self, frame: &mut Frame) {
-        let layout = Layout::horizontal([Constraint::Percentage(50), Constraint::Percentage(50)])
-            .split(frame.area());
-
-        let title = if self.is_syncing {
-            " synchronizing... "
-        } else {
-            " newver "
-        };
+        let vertical =
+            Layout::vertical([Constraint::Fill(1), Constraint::Max(3)]).split(frame.area());
+        let horizontal =
+            Layout::horizontal([Constraint::Percentage(50), Constraint::Percentage(50)])
+                .split(vertical[0]);
 
         let new_data = &self.verfiles.1.data.data;
         let old_data = &self.verfiles.0.data.data;
@@ -72,16 +76,26 @@ impl AppState {
         let mut old_items: Vec<Line> = Vec::with_capacity(old_data.len());
 
         for new in new_data.iter() {
+            if !self.search_input.is_empty() {
+                let search = self.search_input.iter().collect::<String>();
+                if !new.0.contains(&search) {
+                    continue;
+                }
+            }
+
             let old = old_data.iter().find(|old| old.0 == new.0);
 
-            let style = if let Some(old) = old {
+            let (style, display) = if let Some(old) = old {
                 if new.1.version != old.1.version {
-                    (Style::new().fg(Color::Green), Style::new().fg(Color::Red))
+                    (
+                        (Style::new().fg(Color::Green), Style::new().fg(Color::Red)),
+                        true,
+                    )
                 } else {
-                    (Style::default(), Style::default())
+                    ((Style::default(), Style::default()), false)
                 }
             } else {
-                (Style::new().fg(Color::Yellow), Style::default())
+                ((Style::new().fg(Color::Yellow), Style::default()), true)
             };
             let blue = Style::new().fg(Color::Blue);
 
@@ -103,13 +117,17 @@ impl AppState {
                 Line::from("")
             };
 
-            new_items.push(new_line);
-            old_items.push(old_line);
+            if self.filter_updated && !display {
+                continue;
+            } else {
+                new_items.push(new_line);
+                old_items.push(old_line);
+            }
         }
 
         let new_list = List::new(new_items).block(
             Block::bordered()
-                .title_top(title)
+                .title_top(" newver ")
                 .border_type(BorderType::Rounded),
         );
         let old_list = List::new(old_items).block(
@@ -118,8 +136,39 @@ impl AppState {
                 .border_type(BorderType::Rounded),
         );
 
-        frame.render_widget(new_list, layout[0]);
-        frame.render_widget(old_list, layout[1]);
+        frame.render_widget(new_list, horizontal[0]);
+        frame.render_widget(old_list, horizontal[1]);
+
+        self.draw_searchbar(frame, vertical[1]);
+    }
+
+    fn draw_searchbar(&self, frame: &mut Frame, area: Rect) {
+        let title = if self.is_syncing {
+            " synchronizing... "
+        } else {
+            " nvrs "
+        };
+
+        let content = self.search_input.iter().collect::<String>();
+        let display_text = if !self.is_searching && content.is_empty() {
+            Span::styled("search", Style::default().fg(Color::DarkGray))
+        } else {
+            Span::raw(&content)
+        };
+
+        let search_bar = Paragraph::new(display_text).block(
+            Block::bordered()
+                .title_top(title)
+                .title_bottom(if self.is_searching {
+                    KEYBINDS_SEARCH
+                } else {
+                    KEYBINDS
+                })
+                .title_alignment(ratatui::layout::Alignment::Center)
+                .border_type(BorderType::Rounded),
+        );
+
+        frame.render_widget(search_bar, area);
     }
 
     async fn sync(&mut self) -> error::Result<()> {
@@ -135,33 +184,31 @@ impl AppState {
         let mut results = futures::future::join_all(tasks).await;
 
         for package in &config.packages {
-            match results.remove(0).unwrap() {
-                Ok(release) => {
-                    let gitref: String;
-                    let tag = if let Some(t) = release.tag.clone() {
-                        gitref = format!("refs/tags/{}", t);
-                        release.tag.unwrap().replacen(&package.1.prefix, "", 1)
-                    } else {
-                        gitref = String::new();
-                        release.name
-                    };
+            // TODO: error popups
+            if let Ok(release) = results.remove(0).unwrap() {
+                let gitref: String;
+                let tag = if let Some(t) = release.tag.clone() {
+                    gitref = format!("refs/tags/{}", t);
+                    release.tag.unwrap().replacen(&package.1.prefix, "", 1)
+                } else {
+                    gitref = String::new();
+                    release.name
+                };
 
-                    if let Some(new_pkg) = self.verfiles.1.data.data.get_mut(package.0) {
-                        new_pkg.version = tag.to_string();
-                        new_pkg.gitref = gitref;
-                        new_pkg.url = release.url;
-                    } else {
-                        self.verfiles.1.data.data.insert(
-                            package.0.clone(),
-                            verfiles::VerPackage {
-                                version: tag.to_string(),
-                                gitref,
-                                url: release.url,
-                            },
-                        );
-                    }
+                if let Some(new_pkg) = self.verfiles.1.data.data.get_mut(package.0) {
+                    new_pkg.version = tag.to_string();
+                    new_pkg.gitref = gitref;
+                    new_pkg.url = release.url;
+                } else {
+                    self.verfiles.1.data.data.insert(
+                        package.0.clone(),
+                        verfiles::VerPackage {
+                            version: tag.to_string(),
+                            gitref,
+                            url: release.url,
+                        },
+                    );
                 }
-                Err(e) => {}
             }
         }
 
@@ -181,10 +228,31 @@ impl AppState {
     }
 
     fn handle_key_event(&mut self, key_event: KeyEvent) {
-        match key_event.code {
-            KeyCode::Char('q') => self.exit(),
-            KeyCode::Char('s') => self.is_syncing = true,
-            _ => (),
+        if self.is_searching {
+            match key_event.code {
+                KeyCode::Esc => {
+                    self.is_searching = false;
+                    self.search_input.clear();
+                }
+                KeyCode::Backspace => {
+                    self.search_input.pop();
+                }
+                KeyCode::Enter => {
+                    self.is_searching = false;
+                }
+                KeyCode::Char(c) => {
+                    self.search_input.push(c);
+                }
+                _ => {}
+            }
+        } else {
+            match key_event.code {
+                KeyCode::Char('q') => self.exit(),
+                KeyCode::Char('s') => self.is_syncing = true,
+                KeyCode::Char('f') => self.filter_updated = !self.filter_updated,
+                KeyCode::Char('/') => self.is_searching = true,
+                _ => (),
+            }
         }
     }
 
