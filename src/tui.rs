@@ -13,6 +13,8 @@ use tachyonfx::{fx, Duration as FxDuration, Effect, EffectRenderer, Shader};
 const KEYBINDS: &str = " [q] quit  [s] sync  [f] filter updated  [/] search ";
 const KEYBINDS_SEARCH: &str = " [esc] cancel  [enter] search ";
 
+const PACKAGE_ICON: &str = " ";
+
 struct AppState {
     is_running: bool,
     is_syncing: bool,
@@ -102,19 +104,19 @@ impl AppState {
             let name = format!("{} ", new.0);
 
             let new_line = Line::from_iter([
-                "📦️ ".into(),
+                PACKAGE_ICON.into(),
                 Span::styled(name.clone(), blue),
                 Span::styled(new.1.version.clone(), style.0),
             ]);
 
             let old_line = if let Some(old) = old {
                 Line::from_iter([
-                    "📦️ ".into(),
+                    PACKAGE_ICON.into(),
                     Span::styled(name, blue),
                     Span::styled(old.1.version.clone(), style.1),
                 ])
             } else {
-                Line::from("")
+                Line::from_iter([PACKAGE_ICON.into(), Span::styled("NONE", Style::new().fg(Color::Red))])
             };
 
             if self.filter_updated && !display {
