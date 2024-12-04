@@ -32,8 +32,8 @@ async fn init() -> error::Result<(Core, cli::Cli)> {
     let cli = cli::get_args();
     let config = config::load(cli.clone().custom_config).await?;
 
-    let verfiles = verfiles::load(config.0.__config__.clone()).await?;
-    let keyfile = keyfile::load(config.0.__config__.clone()).await?;
+    let verfiles = verfiles::load(&config.0.__config__).await?;
+    let keyfile = keyfile::load(&config.0.__config__).await?;
 
     Ok((
         Core {
@@ -115,7 +115,7 @@ async fn take(core: Core, take_names: Option<Vec<String>>) -> error::Result<()> 
         }
     }
 
-    verfiles::save(oldver, true, config.0.__config__).await
+    verfiles::save(&oldver, true, config.0.__config__).await
 }
 
 async fn nuke(core: Core, nuke_names: Option<Vec<String>>, no_fail: bool) -> error::Result<()> {
@@ -135,8 +135,8 @@ async fn nuke(core: Core, nuke_names: Option<Vec<String>>, no_fail: bool) -> err
         oldver.data.data.remove(&package_name);
     }
 
-    verfiles::save(newver, false, config_content.__config__.clone()).await?;
-    verfiles::save(oldver, true, config_content.__config__.clone()).await?;
+    verfiles::save(&newver, false, config_content.__config__.clone()).await?;
+    verfiles::save(&oldver, true, config_content.__config__.clone()).await?;
     config::save(config_content, core.config.1).await?;
 
     Ok(())
@@ -158,16 +158,15 @@ async fn sync(core: Core, no_fail: bool) -> error::Result<()> {
     for package in config.packages {
         match results.remove(0).unwrap() {
             Ok(release) => {
+                let gitref: String;
+                let tag = if let Some(t) = release.tag.clone() {
+                    gitref = format!("refs/tags/{}", t);
+                    release.tag.unwrap().replacen(&package.1.prefix, "", 1)
+                } else {
+                    gitref = String::new();
+                    release.name
+                };
                 if let Some(new_pkg) = newver.data.data.iter_mut().find(|p| p.0 == &package.0) {
-                    let gitref: String;
-                    let tag = if let Some(t) = release.tag.clone() {
-                        gitref = format!("refs/tags/{}", t);
-                        release.tag.unwrap().replacen(&package.1.prefix, "", 1)
-                    } else {
-                        gitref = String::new();
-                        release.name
-                    };
-
                     if new_pkg.1.version != tag {
                         println!(
                             "{} {} {} -> {}",
@@ -181,15 +180,6 @@ async fn sync(core: Core, no_fail: bool) -> error::Result<()> {
                         new_pkg.1.url = release.url;
                     }
                 } else {
-                    let gitref: String;
-                    let tag = if let Some(t) = release.tag.clone() {
-                        gitref = format!("refs/tags/{}", t);
-                        release.tag.unwrap().replacen(&package.1.prefix, "", 1)
-                    } else {
-                        gitref = String::new();
-                        release.name
-                    };
-
                     println!(
                         "{} {} {} -> {}",
                         "|".white().on_black(),
@@ -217,7 +207,7 @@ async fn sync(core: Core, no_fail: bool) -> error::Result<()> {
         };
     }
 
-    verfiles::save(newver, false, config.__config__).await
+    verfiles::save(&newver, false, config.__config__).await
 }
 
 fn pretty_error(err: &error::Error) {

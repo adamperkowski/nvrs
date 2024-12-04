@@ -41,8 +41,8 @@ pub struct Verfile {
 }
 
 /// load the verfiles specified in [crate::config::ConfigTable]
-pub async fn load(config_table: Option<config::ConfigTable>) -> error::Result<(Verfile, Verfile)> {
-    let config_table = config_table.ok_or(error::Error::NoConfigTable)?;
+pub async fn load(config_table: &Option<config::ConfigTable>) -> error::Result<(Verfile, Verfile)> {
+    let config_table = config_table.to_owned().ok_or(error::Error::NoConfigTable)?;
 
     let oldver_path = config_table.oldver.as_ref().ok_or(error::Error::NoXVer)?;
     let newver_path = config_table.newver.as_ref().ok_or(error::Error::NoXVer)?;
@@ -61,7 +61,7 @@ pub async fn load(config_table: Option<config::ConfigTable>) -> error::Result<(V
 
 /// save changes to the verfiles
 pub async fn save(
-    verfile: Verfile,
+    verfile: &Verfile,
     is_oldver: bool,
     config_table: Option<config::ConfigTable>,
 ) -> error::Result<()> {

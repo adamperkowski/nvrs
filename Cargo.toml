@@ -21,7 +21,7 @@ include = [
 
 [features]
 nvrs_cli = ["clap", "colored", "futures"]
-nvrs_tui = ["ratatui", "crossterm", "anyhow", "tachyonfx"]
+nvrs_tui = ["ratatui", "crossterm", "anyhow", "tachyonfx", "futures"]
 default = ["aur", "github", "gitlab"]
 aur = []
 github = []
