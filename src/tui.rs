@@ -5,7 +5,7 @@ use ratatui::{
     layout::{Constraint, Layout, Rect},
     style::{Color, Style},
     text::{Line, Span},
-    widgets::{Block, BorderType, List, Paragraph},
+    widgets::{Block, BorderType, List, ListState, Paragraph},
     Frame,
 };
 use tachyonfx::{fx, Duration as FxDuration, Effect, EffectRenderer, Shader};
@@ -25,6 +25,7 @@ struct AppState {
     effect: Effect,
     search_input: Vec<char>,
     is_searching: bool,
+    list_state: ListState,
 
     // nvrs data
     config: (config::Config, std::path::PathBuf),
@@ -47,6 +48,11 @@ impl AppState {
             effect: fx::coalesce(800),
             search_input: Vec::new(),
             is_searching: false,
+            list_state: {
+                let mut state = ListState::default();
+                state.select(Some(0));
+                state
+            },
 
             // nvrs data
             config,
@@ -143,8 +149,8 @@ impl AppState {
                 .border_type(BorderType::Rounded),
         );
 
-        frame.render_widget(new_list, horizontal[0]);
-        frame.render_widget(old_list, horizontal[1]);
+        frame.render_stateful_widget(new_list, horizontal[0], &mut self.list_state);
+        frame.render_stateful_widget(old_list, horizontal[1], &mut self.list_state);
 
         self.draw_searchbar(frame, vertical[1]);
     }
@@ -248,12 +254,8 @@ impl AppState {
                 KeyCode::Backspace => {
                     self.search_input.pop();
                 }
-                KeyCode::Enter => {
-                    self.is_searching = false;
-                }
-                KeyCode::Char(c) => {
-                    self.search_input.push(c);
-                }
+                KeyCode::Enter => self.is_searching = false,
+                KeyCode::Char(c) => self.search_input.push(c),
                 _ => {}
             }
         } else {
@@ -262,6 +264,8 @@ impl AppState {
                 KeyCode::Char('s') => self.is_syncing = true,
                 KeyCode::Char('f') => self.filter_updated = !self.filter_updated,
                 KeyCode::Char('/') => self.is_searching = true,
+                KeyCode::Down | KeyCode::Char('j') => self.list_state.select_next(),
+                KeyCode::Up | KeyCode::Char('k') => self.list_state.select_previous(),
                 _ => (),
             }
         }
@@ -278,9 +282,7 @@ async fn main() -> Result<()> {
     let mut terminal = ratatui::init();
 
     while app.is_running {
-        terminal.draw(|f| {
-            app.draw(f);
-        })?;
+        terminal.draw(|f| app.draw(f))?;
 
         if app.effect.running() {
             continue;
@@ -291,6 +293,13 @@ async fn main() -> Result<()> {
         } else {
             app.handle_events()?;
         }
+    }
+
+    app.effect.reverse();
+    app.effect.reset();
+
+    while app.effect.running() {
+        terminal.draw(|f| app.draw(f))?;
     }
 
     ratatui::restore();
