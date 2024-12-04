@@ -24,8 +24,8 @@ pub mod verfiles;
 /// use nvrs::*;
 ///
 /// let config = config::load(None).await.unwrap();
-/// let verfiles = verfiles::load(config.0.__config__.clone()).await.unwrap();
-/// let keyfile = keyfile::load(config.0.__config__.clone()).await.unwrap();
+/// let verfiles = verfiles::load(&config.0.__config__).await.unwrap();
+/// let keyfile = keyfile::load(&config.0.__config__).await.unwrap();
 ///
 /// Core {
 ///     config,
