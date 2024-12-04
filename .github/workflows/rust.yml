@@ -53,7 +53,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Test lub & docs
+      - name: Test lib & docs
         run: |
           cargo test --lib --all-features
           cargo test --doc --all-features
