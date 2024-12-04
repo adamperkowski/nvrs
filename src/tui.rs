@@ -2,9 +2,10 @@ use anyhow::Result;
 use crossterm::event::{self, Event, KeyCode, KeyEvent, KeyEventKind};
 use nvrs::*;
 use ratatui::{
-    layout::Alignment,
-    style::{Style, Stylize},
-    widgets::{Block, BorderType, List, ListItem},
+    layout::{Constraint, Layout},
+    style::{Color, Style},
+    text::{Line, Span},
+    widgets::{Block, BorderType, List},
     Frame,
 };
 use tachyonfx::{fx, Duration as FxDuration, Effect, EffectRenderer, Shader};
@@ -14,6 +15,7 @@ const KEYBINDS: &str = " [q] Quit  [s] Sync ";
 struct AppState {
     is_running: bool,
     is_syncing: bool,
+    is_comparing: bool,
     effect: Effect,
 
     // nvrs data
@@ -32,6 +34,7 @@ impl AppState {
         Ok(Self {
             is_running: true,
             is_syncing: false,
+            is_comparing: true,
             effect: fx::coalesce(800),
 
             // nvrs data
@@ -43,30 +46,80 @@ impl AppState {
     }
 
     fn draw(&mut self, frame: &mut Frame) {
-        let new_names = self.verfiles.1.data.data.keys().collect::<Vec<_>>();
-
-        let list = List::new(
-            new_names
-                .iter()
-                .map(|p| ListItem::new(format!("📦️ {}", p)).style(Style::default().blue())),
-        )
-        .block(
-            Block::bordered()
-                .title_top(if self.is_syncing {
-                    " Synchronizing... "
-                } else {
-                    " nvrs "
-                })
-                .title_bottom(KEYBINDS)
-                .title_alignment(Alignment::Center)
-                .border_type(BorderType::Rounded),
-        );
-
-        frame.render_widget(list, frame.area());
+        if self.is_comparing {
+            self.draw_compare(frame);
+        }
 
         if self.effect.running() {
             frame.render_effect(&mut self.effect, frame.area(), FxDuration::from_millis(50))
         }
+    }
+
+    fn draw_compare(&mut self, frame: &mut Frame) {
+        let layout = Layout::horizontal([Constraint::Percentage(50), Constraint::Percentage(50)])
+            .split(frame.area());
+
+        let title = if self.is_syncing {
+            " synchronizing... "
+        } else {
+            " newver "
+        };
+
+        let new_data = &self.verfiles.1.data.data;
+        let old_data = &self.verfiles.0.data.data;
+
+        let mut new_items: Vec<Line> = Vec::with_capacity(new_data.len());
+        let mut old_items: Vec<Line> = Vec::with_capacity(old_data.len());
+
+        for new in new_data.iter() {
+            let old = old_data.iter().find(|old| old.0 == new.0);
+
+            let style = if let Some(old) = old {
+                if new.1.version != old.1.version {
+                    (Style::new().fg(Color::Green), Style::new().fg(Color::Red))
+                } else {
+                    (Style::default(), Style::default())
+                }
+            } else {
+                (Style::new().fg(Color::Yellow), Style::default())
+            };
+            let blue = Style::new().fg(Color::Blue);
+
+            let name = format!("{} ", new.0);
+
+            let new_line = Line::from_iter([
+                "📦️ ".into(),
+                Span::styled(name.clone(), blue),
+                Span::styled(new.1.version.clone(), style.0),
+            ]);
+
+            let old_line = if let Some(old) = old {
+                Line::from_iter([
+                    "📦️ ".into(),
+                    Span::styled(name, blue),
+                    Span::styled(old.1.version.clone(), style.1),
+                ])
+            } else {
+                Line::from("")
+            };
+
+            new_items.push(new_line);
+            old_items.push(old_line);
+        }
+
+        let new_list = List::new(new_items).block(
+            Block::bordered()
+                .title_top(title)
+                .border_type(BorderType::Rounded),
+        );
+        let old_list = List::new(old_items).block(
+            Block::bordered()
+                .title_top(" oldver ")
+                .border_type(BorderType::Rounded),
+        );
+
+        frame.render_widget(new_list, layout[0]);
+        frame.render_widget(old_list, layout[1]);
     }
 
     async fn sync(&mut self) -> error::Result<()> {
@@ -74,7 +127,7 @@ impl AppState {
 
         let tasks: Vec<_> = config
             .packages
-            .to_owned()
+            .clone()
             .into_iter()
             .map(|p| tokio::spawn(run_source(p, self.client.clone(), self.keyfile.clone())))
             .collect();
