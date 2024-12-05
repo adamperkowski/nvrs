@@ -54,6 +54,4 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Test lib & docs
-        run: |
-          cargo test --lib --all-features
-          cargo test --doc --all-features
+        run: cargo test --all-features --no-fail-fast

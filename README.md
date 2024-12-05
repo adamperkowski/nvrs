@@ -30,6 +30,7 @@ check the [release notes](https://github.com/adamperkowski/nvrs/releases) for co
 - `aur`
 - `github`
 - `gitlab` (with custom hosts)
+- `website` (regex)
 
 ### QOL improvements
 - `ALL` argument for the `--take` command
@@ -145,6 +146,8 @@ package entries are custom entries in the main config file. they contain values 
 | `host`        | domain name the source is hosted on                                       | string | ❌       | ❌     |
 | `prefix`      | the prefix used in releases / tags<br>example: `v` for tags like `v0.1.0` | string | ❌       | ❌     |
 | `use_max_tag` | use max git tag instead of the latest release                             | bool   | ❌       | ❌     |
+| `url`         | url to check for source type `regex`                                      | string | ❌       | ❌     |
+| `regex`       | regex to search url for source type `regex`                               | bool   | ❌       | ❌     |
 
 ### Keyfile structure
 this file contains API keys for various [sources](#sources). example can be found [here](/n_keyfile.toml).

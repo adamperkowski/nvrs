@@ -57,7 +57,7 @@ async fn compare(core: Core) -> error::Result<()> {
                     "*".white().on_black(),
                     new_pkg.0.blue(),
                     old_pkg.1.version.red(),
-                    new_pkg.1.version.blue()
+                    new_pkg.1.version.green()
                 );
             }
         } else {

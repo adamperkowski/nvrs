@@ -59,6 +59,12 @@ pub struct Package {
     #[serde(default)]
     #[serde(skip_serializing_if = "is_empty_string")]
     gitlab: String,
+    #[cfg(feature = "regex")]
+    #[serde(default)]
+    url: String,
+    #[cfg(feature = "regex")]
+    #[serde(default)]
+    regex: String,
 
     /// whether to use the latest tag instead of the latest release
     #[serde(default)]
@@ -95,6 +101,11 @@ impl Package {
                 package.gitlab = target;
                 Ok(())
             }
+            #[cfg(feature = "regex")]
+            "regex" => {
+                package.url = target;
+                Ok(())
+            }
             _ => Err(error::Error::SourceNotFound(source.clone())),
         }?;
 
@@ -115,6 +126,10 @@ impl Package {
             github: String::new(),
             #[cfg(feature = "gitlab")]
             gitlab: String::new(),
+            #[cfg(feature = "regex")]
+            url: String::new(),
+            #[cfg(feature = "regex")]
+            regex: String::new(),
             use_max_tag: None,
             prefix: String::new(),
         }
@@ -137,6 +152,8 @@ impl Package {
             "github" => vec![self.github.clone()],
             #[cfg(feature = "gitlab")]
             "gitlab" => vec![self.gitlab.clone(), self.host.clone()],
+            #[cfg(feature = "regex")]
+            "regex" => vec![self.url.clone(), self.regex.clone()],
             _ => vec![],
         };
 
@@ -187,6 +204,8 @@ pub async fn save(config_content: Config, path: PathBuf) -> error::Result<()> {
     let mut file = fs::File::create(path).await?;
     let content = format!("{}\n", toml::to_string(&config_content)?);
     file.write_all(content.as_bytes()).await?;
+    file.shutdown().await?;
+
     Ok(())
 }
 

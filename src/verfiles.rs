@@ -76,6 +76,8 @@ pub async fn save(
     let content = format!("{}\n", serde_json::to_string_pretty(&verfile)?);
 
     file.write_all(content.as_bytes()).await?;
+    file.shutdown().await?;
+
     Ok(())
 }
 
@@ -83,6 +85,7 @@ async fn load_file(path: &Path) -> error::Result<Verfile> {
     if !path.exists() {
         let mut file = fs::File::create(path).await?;
         file.write_all(TEMPLATE.as_bytes()).await?;
+        file.shutdown().await?;
     }
 
     let content = fs::read_to_string(path).await?;
