@@ -240,6 +240,7 @@ impl AppState {
             }
         }
 
+        self.list_state.select(Some(0));
         self.is_syncing = false;
 
         verfiles::save(&self.verfiles.1, false, config.__config__.clone()).await
@@ -278,7 +279,15 @@ impl AppState {
                 KeyCode::Char('s') => self.is_syncing = true,
                 KeyCode::Char('f') => self.filter_updated = !self.filter_updated,
                 KeyCode::Char('/') => self.is_searching = true,
-                KeyCode::Down | KeyCode::Char('j') => self.list_state.select_next(),
+                KeyCode::Down | KeyCode::Char('j') => {
+                    if self
+                        .list_state
+                        .selected()
+                        .is_some_and(|s| s + 1 < self.verfiles.1.data.data.len())
+                    {
+                        self.list_state.select_next()
+                    }
+                }
                 KeyCode::Up | KeyCode::Char('k') => self.list_state.select_previous(),
                 _ => (),
             }
