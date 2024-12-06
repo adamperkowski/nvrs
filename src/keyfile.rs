@@ -46,9 +46,9 @@ impl Keyfile {
 /// load contents of the specified keyfile
 ///
 /// see `keyfile` in [crate::config::ConfigTable]
-pub async fn load(config_content: Option<config::ConfigTable>) -> error::Result<Option<Keyfile>> {
+pub async fn load(config_content: &Option<config::ConfigTable>) -> error::Result<Option<Keyfile>> {
     if let Some(config_table) = config_content {
-        if let Some(keyfile) = config_table.keyfile {
+        if let Some(keyfile) = config_table.to_owned().keyfile {
             let keyfile_path = Path::new(&keyfile);
             let keyfile_content = if keyfile_path.exists() && keyfile_path.is_file() {
                 fs::read_to_string(keyfile_path).await?

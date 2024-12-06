@@ -3,7 +3,7 @@
 
 Output nvrs.gif
 
-Require echo
+Require nvrs
 
 Set Shell "zsh"
 Set FontSize 32
