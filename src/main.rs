@@ -30,7 +30,7 @@ async fn main() -> error::Result<()> {
 
 async fn init() -> error::Result<(Core, cli::Cli)> {
     let cli = cli::get_args();
-    let config = config::load(cli.clone().custom_config).await?;
+    let config = config::load(&cli.custom_config).await?;
 
     let verfiles = verfiles::load(&config.0.__config__).await?;
     let keyfile = keyfile::load(&config.0.__config__).await?;
@@ -96,9 +96,10 @@ async fn take(core: Core, take_names: Option<Vec<String>>) -> error::Result<()> 
                         old_pkg.version.red(),
                         new_pkg.version.green()
                     );
-                    old_pkg.version = new_pkg.version.clone();
-                    old_pkg.gitref = new_pkg.gitref.clone();
-                    old_pkg.url = new_pkg.url.clone();
+                    let pkg = new_pkg.to_owned();
+                    old_pkg.version = pkg.version;
+                    old_pkg.gitref =pkg.gitref;
+                    old_pkg.url = pkg.url;
                 }
             } else {
                 println!(
@@ -108,14 +109,14 @@ async fn take(core: Core, take_names: Option<Vec<String>>) -> error::Result<()> 
                     "NONE".red(),
                     new_pkg.version.green()
                 );
-                oldver.data.data.insert(package_name, new_pkg.clone());
+                oldver.data.data.insert(package_name, new_pkg.to_owned());
             }
         } else {
             return Err(error::Error::PkgNotInNewver(package_name));
         }
     }
 
-    verfiles::save(&oldver, true, config.0.__config__).await
+    verfiles::save(&oldver, true, &config.0.__config__).await
 }
 
 async fn nuke(core: Core, nuke_names: Option<Vec<String>>, no_fail: bool) -> error::Result<()> {
@@ -135,9 +136,9 @@ async fn nuke(core: Core, nuke_names: Option<Vec<String>>, no_fail: bool) -> err
         oldver.data.data.remove(&package_name);
     }
 
-    verfiles::save(&newver, false, config_content.__config__.clone()).await?;
-    verfiles::save(&oldver, true, config_content.__config__.clone()).await?;
-    config::save(config_content, core.config.1).await?;
+    verfiles::save(&newver, false, &config_content.__config__).await?;
+    verfiles::save(&oldver, true, &config_content.__config__).await?;
+    config::save(&config_content, core.config.1).await?;
 
     Ok(())
 }
@@ -175,7 +176,7 @@ async fn sync(core: Core, no_fail: bool) -> error::Result<()> {
                             new_pkg.1.version.red(),
                             tag.green()
                         );
-                        new_pkg.1.version = tag.clone();
+                        new_pkg.1.version = tag;
                         new_pkg.1.gitref = gitref;
                         new_pkg.1.url = release.url;
                     }
@@ -190,7 +191,7 @@ async fn sync(core: Core, no_fail: bool) -> error::Result<()> {
                     newver.data.data.insert(
                         package.0,
                         verfiles::VerPackage {
-                            version: tag.clone(),
+                            version: tag,
                             gitref,
                             url: release.url,
                         },
@@ -207,7 +208,7 @@ async fn sync(core: Core, no_fail: bool) -> error::Result<()> {
         };
     }
 
-    verfiles::save(&newver, false, config.__config__).await
+    verfiles::save(&newver, false, &config.__config__).await
 }
 
 fn pretty_error(err: &error::Error) {

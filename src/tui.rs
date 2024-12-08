@@ -23,8 +23,10 @@ struct AppState {
     is_comparing: bool,
     filter_updated: bool,
     effect: Effect,
+    items: Vec<api::Release>,
     search_input: Vec<char>,
     is_searching: bool,
+    completion_preview: Option<String>,
     list_state: ListState,
 
     // nvrs data
@@ -36,7 +38,7 @@ struct AppState {
 
 impl AppState {
     async fn new() -> Result<Self> {
-        let config = config::load(None).await?; // TODO: custom config path
+        let config = config::load(&None).await?; // TODO: custom config path
         let verfiles = verfiles::load(&config.0.__config__).await?;
         let keyfile = keyfile::load(&config.0.__config__).await?;
 
@@ -46,8 +48,10 @@ impl AppState {
             is_comparing: true,
             filter_updated: false,
             effect: fx::coalesce(800),
+            items: Vec::new(),
             search_input: Vec::new(),
             is_searching: false,
+            completion_preview: None,
             list_state: {
                 let mut state = ListState::default();
                 state.select(Some(0));
@@ -120,7 +124,7 @@ impl AppState {
             let new_line = Line::from_iter([
                 PACKAGE_ICON.into(),
                 Span::styled(name.clone(), blue),
-                Span::styled(new.1.version.clone(), style.0),
+                Span::styled(&new.1.version, style.0),
             ])
             .style(selected_style);
 
@@ -128,7 +132,7 @@ impl AppState {
                 Line::from_iter([
                     PACKAGE_ICON.into(),
                     Span::styled(name, blue),
-                    Span::styled(old.1.version.clone(), style.1),
+                    Span::styled(&old.1.version, style.1),
                 ])
                 .style(selected_style)
             } else {
@@ -199,6 +203,9 @@ impl AppState {
         frame.render_widget(search_bar, area);
     }
 
+    fn update_completion_preview(&mut self) {
+    }
+
     async fn sync(&mut self) -> error::Result<()> {
         let config = &self.config.0;
 
@@ -215,9 +222,9 @@ impl AppState {
             // TODO: error popups
             if let Ok(release) = results.remove(0).unwrap() {
                 let gitref: String;
-                let tag = if let Some(t) = release.tag.clone() {
+                let tag = if let Some(t) = release.tag {
                     gitref = format!("refs/tags/{}", t);
-                    release.tag.unwrap().replacen(&package.1.prefix, "", 1)
+                    t.replacen(&package.1.prefix, "", 1)
                 } else {
                     gitref = String::new();
                     release.name
@@ -229,7 +236,7 @@ impl AppState {
                     new_pkg.url = release.url;
                 } else {
                     self.verfiles.1.data.data.insert(
-                        package.0.clone(),
+                        package.0.to_string(),
                         verfiles::VerPackage {
                             version: tag.to_string(),
                             gitref,
@@ -243,7 +250,7 @@ impl AppState {
         self.list_state.select(Some(0));
         self.is_syncing = false;
 
-        verfiles::save(&self.verfiles.1, false, config.__config__.clone()).await
+        verfiles::save(&self.verfiles.1, false, &config.__config__).await
     }
 
     fn handle_events(&mut self) -> Result<()> {

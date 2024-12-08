@@ -33,11 +33,12 @@ struct KeysTable {
 impl Keyfile {
     /// returns API key for the specified API name (empty string if not found)
     pub async fn get_key(&self, api_name: &str) -> String {
+        let keys = self.keys.to_owned();
         match api_name {
             #[cfg(feature = "github")]
-            "github" => self.keys.github.clone(),
+            "github" => keys.github,
             #[cfg(feature = "gitlab")]
-            "gitlab" => self.keys.gitlab.clone(),
+            "gitlab" => keys.gitlab,
             _ => String::new(),
         }
     }
