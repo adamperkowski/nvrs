@@ -13,7 +13,7 @@
 
 ## Features
 ### [nvchecker](https://github.com/lilydjwg/nvchecker) compatibility
-check the [release notes](https://github.com/adamperkowski/nvrs/releases) for compatibility updates
+check the [release notes](https://github.com/adamperkowski/nvrs/releases) and [configuration docs](#configuration) for compatibility updates and instructions.
 
 ### Speed
 <img align='right' src='https://media1.tenor.com/m/mMWXOkCEndoAAAAC/ka-chow-lightning-mcqueen.gif' alt='ka-chow' width=80 height=45>
@@ -75,12 +75,12 @@ note that crates installed using `cargo install` require manual updating with `c
 <details>
 <summary>Manual</summary>
 
-1. Download the latest binary from [GitHub's release page](https://github.com/adamperkowski/nvrs/releases/latest)
-2. Allow execution
+1. download the latest binary from [GitHub's release page](https://github.com/adamperkowski/nvrs/releases/latest)
+2. allow execution
 ```sh
 chmod +x nvrs
 ```
-3. Move the file to a directory in `$PATH` (using `/usr/bin` as an example)
+3. move the file to a directory in `$PATH` (using `/usr/bin` as an example)
 ```sh
 sudo mv nvrs /usr/bin/nvrs
 ```
@@ -113,6 +113,8 @@ nvrs -c
 # update the known versions
 nvrs -t ALL
 ```
+
+for all available commands, options and flags, see `nvrs --help` and the [manual page](/man/nvrs.1).
 
 ## Configuration
 nvrs relies on a configuration file ([example](/nvrs.toml)) containing basic settings, such as `oldver`, `newver` & `keyfile` paths, as well as [package entries](#package-entries). supported config paths:
@@ -160,6 +162,12 @@ gitlab = "remember_to_replace_the_example_values_here_here_with_your_actual_keys
 
 ## Documentation
 the nvrs library documentation can be found at [docs.rs/nvrs](https://docs.rs/nvrs/latest/nvrs)
+
+## Contributing
+
+if you want to contribute to the project, please read the [Contributing Guidelines](/CONTRIBUTING.md) before doing so.
+
+if you find any parts of the code or the documentation unclear, or have any suggestions, feel free to [open an issue](https://github.com/adamperkowski/nvrs/issues/new/choose) or a [pull request](https://github.com/adamperkowski/nvrs/pull/new).
 
 ## Credits
 - [依云](https://github.com/lilydjwg) | the original [nvchecker](https://github.com/lilydjwg/nvchecker)

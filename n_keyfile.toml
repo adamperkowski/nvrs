@@ -1,8 +1,6 @@
-# nvrs
+# this is an example key configuration file for nvrs
+# also see `nvrs.toml`
 # https://github.com/adamperkowski/nvrs
-
-# this is an example key configuration file
-# see `nvrs.toml`
 
 [keys]
 # github = "[REDACTED]"
