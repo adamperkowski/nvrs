@@ -1,4 +1,5 @@
 use colored::Colorize;
+
 use nvrs::*;
 
 mod args;
@@ -19,10 +20,10 @@ async fn main() -> error::Result<()> {
 
             match res {
                 Ok(_) => (),
-                Err(e) => pretty_error(&e),
+                Err(e) => e.pretty(),
             }
         }
-        Err(e) => pretty_error(&e),
+        Err(e) => e.pretty(),
     }
 
     Ok(())
@@ -128,7 +129,7 @@ async fn nuke(core: Core, nuke_names: Option<Vec<String>>, no_fail: bool) -> err
         if config_content.packages.contains_key(&package_name) {
             config_content.packages.remove(&package_name);
         } else if no_fail {
-            pretty_error(&error::Error::PkgNotInConfig(package_name.clone()));
+            error::Error::PkgNotInConfig(package_name.clone()).pretty();
         } else {
             return Err(error::Error::PkgNotInConfig(package_name));
         }
@@ -202,36 +203,13 @@ async fn sync(core: Core, no_fail: bool) -> error::Result<()> {
                 if !no_fail {
                     return Err(e);
                 } else {
-                    pretty_error(&e);
+                    e.pretty();
                 }
             }
         };
     }
 
     verfiles::save(&newver, false, &config.__config__).await
-}
-
-fn pretty_error(err: &error::Error) {
-    let mut lines: Vec<String> = err
-        .to_string()
-        .lines()
-        .map(|line| line.to_string())
-        .collect();
-    let first = lines.remove(0);
-    let first_split = first.split_once(':').unwrap_or(("", &first));
-    if first_split.0.is_empty() {
-        println!("{} {}", "!".red().bold().on_black(), first_split.1.red());
-    } else {
-        println!(
-            "{} {}:{}",
-            "!".red().bold().on_black(),
-            first_split.0,
-            first_split.1.red()
-        );
-    }
-    for line in lines {
-        println!("{}  {}", "!".red().on_black(), line)
-    }
 }
 
 #[tokio::test]

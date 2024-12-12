@@ -3,7 +3,13 @@ mod state;
 
 #[tokio::main]
 async fn main() -> Result<()> {
-    let mut app = state::App::new().await?;
+    let mut app = state::App::new()
+        .await
+        .map_err(|e| {
+            e.pretty();
+            std::process::exit(1)
+        })
+        .unwrap();
     let mut terminal = ratatui::init();
 
     while app.is_running {

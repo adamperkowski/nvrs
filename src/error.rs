@@ -2,6 +2,9 @@
 
 use thiserror::Error as ThisError;
 
+#[cfg(feature = "pretty")]
+use colored::Colorize;
+
 const RATE_LIMIT: &str = "we might be getting rate-limited here";
 const CONFIG_PATHS: &str = "config file locations:
  ~/.config/nvrs.toml
@@ -87,6 +90,47 @@ pub enum Error {
 
 /// custom Result type for nvrs
 pub type Result<T> = std::result::Result<T, Error>;
+
+impl Error {
+    /// display a pretty formatted error message
+    /// # example usage
+    /// ```rust
+    /// use nvrs::error;
+    ///
+    /// let config_error = error::Error::NoConfig;
+    /// let source_error = error::Error::SourceNotFound("github".to_string());
+    ///
+    ///println!("config error:\n");
+    /// config_err.pretty();
+    ///println!("\n\nsource error:\n");
+    /// source_err.pretty();
+    /// ```
+    /// the above example will result in:
+    /// [image](https://imgur.com/a/4SZeFXn)
+    #[cfg(feature = "pretty")]
+    pub fn pretty(&self) {
+        let mut lines: Vec<String> = self
+            .to_string()
+            .lines()
+            .map(|line| line.to_string())
+            .collect();
+        let first = lines.remove(0);
+        let first_split = first.split_once(':').unwrap_or(("", &first));
+        if first_split.0.is_empty() {
+            println!("{} {}", "!".red().bold().on_black(), first_split.1.red());
+        } else {
+            println!(
+                "{} {}:{}",
+                "!".red().bold().on_black(),
+                first_split.0,
+                first_split.1.red()
+            );
+        }
+        for line in lines {
+            println!("{}  {}", "!".red().on_black(), line)
+        }
+    }
+}
 
 #[test]
 fn test_error() {

@@ -138,11 +138,15 @@ impl Package {
     /// global function to get various API-specific agrs for a package
     ///
     /// # example
-    /// ```rust,ignore
-    /// // package has `source = "github"` * `github = "adamperkowski/nvrs"` specified
+    /// ```rust
+    /// use nvrs::config::Package;
+    ///
+    /// let package = Package::new("github".to_string(), "adamperkowski/nvrs".to_string(),
+    /// false, "v".to_string()).unwrap();
+    ///
     /// let args = package.get_api();
     ///
-    /// assert_eq!(package, ("github", vec!["adamperkowski/nvrs"]))
+    /// assert_eq!(args, ("github".to_string(), vec!["adamperkowski/nvrs".to_string()]))
     /// ```
     pub fn get_api(&self) -> (String, Vec<String>) {
         let self_ref = self.to_owned();

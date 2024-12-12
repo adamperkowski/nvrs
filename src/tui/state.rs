@@ -37,7 +37,7 @@ pub struct App {
 }
 
 impl App {
-    pub async fn new() -> Result<Self> {
+    pub async fn new() -> error::Result<Self> {
         let config = config::load(&None).await?; // TODO: custom config path
         let verfiles = verfiles::load(&config.0.__config__).await?;
         let keyfile = keyfile::load(&config.0.__config__).await?;

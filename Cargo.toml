@@ -20,8 +20,9 @@ include = [
 ]
 
 [features]
-nvrs_cli = ["clap", "colored", "futures"]
-nvrs_tui = ["ratatui", "crossterm", "anyhow", "tachyonfx", "futures"]
+nvrs_cli = ["clap", "pretty", "futures"]
+nvrs_tui = ["ratatui", "crossterm", "anyhow", "tachyonfx", "pretty", "futures"]
+pretty = ["colored"]
 default = ["aur", "github", "gitlab", "regex"]
 aur = []
 github = []
