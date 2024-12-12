@@ -98,7 +98,7 @@ async fn take(core: Core, take_names: Option<Vec<String>>) -> error::Result<()> 
                     );
                     let pkg = new_pkg.to_owned();
                     old_pkg.version = pkg.version;
-                    old_pkg.gitref =pkg.gitref;
+                    old_pkg.gitref = pkg.gitref;
                     old_pkg.url = pkg.url;
                 }
             } else {

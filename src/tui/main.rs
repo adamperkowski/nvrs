@@ -203,8 +203,7 @@ impl AppState {
         frame.render_widget(search_bar, area);
     }
 
-    fn update_completion_preview(&mut self) {
-    }
+    fn update_completion_preview(&mut self) {}
 
     async fn sync(&mut self) -> error::Result<()> {
         let config = &self.config.0;
