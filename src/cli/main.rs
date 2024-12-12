@@ -1,7 +1,7 @@
 use colored::Colorize;
 use nvrs::*;
 
-mod cli;
+mod args;
 
 #[tokio::main]
 async fn main() -> error::Result<()> {
@@ -28,8 +28,8 @@ async fn main() -> error::Result<()> {
     Ok(())
 }
 
-async fn init() -> error::Result<(Core, cli::Cli)> {
-    let cli = cli::get_args();
+async fn init() -> error::Result<(Core, args::Cli)> {
+    let cli = args::get_args();
     let config = config::load(&cli.custom_config).await?;
 
     let verfiles = verfiles::load(&config.0.__config__).await?;
