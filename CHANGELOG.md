@@ -8,6 +8,7 @@ All notable changes to nvrs will be documented in this file.
 
 - `--list-sources` command ([442c06f](https://github.com/adamperkowski/nvrs/commit/442c06f0e56f4adcc0c2ad44d042997cb088a930))
 - (*sources*) add regex ([#13](https://github.com/adamperkowski/nvrs/issues/13)) ([fa12ce9](https://github.com/adamperkowski/nvrs/commit/fa12ce9691adbdcf51990eb8416aedf4fdc7d36b))
+- (*sources*) add crates.io ([78294ff](https://github.com/adamperkowski/nvrs/commit/78294ff44f26ce79df0c7c7c2511517627fc4a31))
 
 ### 🐛 Bug Fixes
 
@@ -23,6 +24,7 @@ All notable changes to nvrs will be documented in this file.
 
 - more details & improvements ([9f02405](https://github.com/adamperkowski/nvrs/commit/9f02405339c3520340899313365f0de2fb3d65c5))
 - (*README*) update cargo install instructions ([88f0fdc](https://github.com/adamperkowski/nvrs/commit/88f0fdce435c50df44c3ae2cfd5d1087df4376fc))
+- improve the wording ([c47df3d](https://github.com/adamperkowski/nvrs/commit/c47df3dbe342bacc79ba2099f17365f07555cdd3))
 
 ### ⚙️ Miscellaneous Tasks
 
