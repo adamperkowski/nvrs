@@ -37,3 +37,7 @@ source = 'regex'
 url = 'https://www.kernel.org/'
 encoding = 'utf8'
 regex = '<td><strong>([\d.]+)</strong></td>'
+
+[nvrs]
+source = "cratesio"
+cratesio = "nvrs"

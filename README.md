@@ -26,6 +26,7 @@ check the [release notes](https://github.com/adamperkowski/nvrs/releases) and [c
 
 ### Sources
 - `aur`
+- `cratesio`
 - `github`
 - `gitlab` (with custom hosts)
 - `website` (regex)
