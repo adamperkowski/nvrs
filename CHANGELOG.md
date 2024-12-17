@@ -12,13 +12,14 @@ All notable changes to nvrs will be documented in this file.
 
 - `--list-sources` command ([442c06f](https://github.com/adamperkowski/nvrs/commit/442c06f0e56f4adcc0c2ad44d042997cb088a930))
 - (*sources*) add regex ([#13](https://github.com/adamperkowski/nvrs/issues/13)) ([fa12ce9](https://github.com/adamperkowski/nvrs/commit/fa12ce9691adbdcf51990eb8416aedf4fdc7d36b))
+- (*sources*) add crates.io ([78294ff](https://github.com/adamperkowski/nvrs/commit/78294ff44f26ce79df0c7c7c2511517627fc4a31))
 
 ### 🐛 Bug Fixes
 
 - incorrect `--compare` colors ([ef1f78f](https://github.com/adamperkowski/nvrs/commit/ef1f78fed76f883986734b7e3220b2f56508a5f0))
 - (*io*) not shutting down file streams after writing ([a8a42fd](https://github.com/adamperkowski/nvrs/commit/a8a42fdf03bfde7aeee563fbd6f9d7af832bc70e))
 
-### ⚙️ Refactoring
+### 🛠️ Refactoring
 
 - (*verfiles, config*) saving & loading improvements ([81d7efd](https://github.com/adamperkowski/nvrs/commit/81d7efd24b9b425f59bec1cdbb588bc25ed433cb))
 - split features & binaries ([4acd98e](https://github.com/adamperkowski/nvrs/commit/4acd98e5d2c5df0845c6bd512cb40f705da9361e))
@@ -27,6 +28,7 @@ All notable changes to nvrs will be documented in this file.
 
 - more details & improvements ([9f02405](https://github.com/adamperkowski/nvrs/commit/9f02405339c3520340899313365f0de2fb3d65c5))
 - (*README*) update cargo install instructions ([88f0fdc](https://github.com/adamperkowski/nvrs/commit/88f0fdce435c50df44c3ae2cfd5d1087df4376fc))
+- improve the wording ([c47df3d](https://github.com/adamperkowski/nvrs/commit/c47df3dbe342bacc79ba2099f17365f07555cdd3))
 
 ### ⚙️ Miscellaneous Tasks
 
@@ -48,7 +50,7 @@ All notable changes to nvrs will be documented in this file.
 - (*ui*) `sync` errors displayed twice when no `--no-fail` ([8d7e341](https://github.com/adamperkowski/nvrs/commit/8d7e3413e258ac1b1a38256de10f02d8f078d68d))
 - `Package` default() & new() features ([779c1ef](https://github.com/adamperkowski/nvrs/commit/779c1ef7e21c4ed6c31a524797a3f94c8678a3d5))
 
-### ⚙️ Refactoring
+### 🛠️ Refactoring
 
 - (*features*) remove `http` ([712bcea](https://github.com/adamperkowski/nvrs/commit/712bceae2626838af664df10dd967cb4a2819ab8))
 
@@ -72,7 +74,7 @@ All notable changes to nvrs will be documented in this file.
 - (*verfile*) allow missing gitref & url ([b93216d](https://github.com/adamperkowski/nvrs/commit/b93216d5146a672897e11938668e05cfa859cfac))
 - `--nuke` not working ([15b75d9](https://github.com/adamperkowski/nvrs/commit/15b75d99667a4c52d0d9b093704aa02ca4d35e3e))
 
-### ⚙️ Refactoring
+### 🛠️ Refactoring
 
 - (*codebase*) [**breaking**] move internal logic to `lib` ([#4](https://github.com/adamperkowski/nvrs/issues/4)) ([c0021f0](https://github.com/adamperkowski/nvrs/commit/c0021f0a4e02791802fba9ba6bca5486f825ee4e))
 
@@ -168,7 +170,7 @@ All notable changes to nvrs will be documented in this file.
 
 - (*hot*) a typo in `custom_error` ([4844515](https://github.com/adamperkowski/nvrs/commit/48445157be6b3ae9ca97d6c79f25b20529e30fd7))
 
-### ⚙️ Refactoring
+### 🛠️ Refactoring
 
 - (*custom_error*) improve newline control ([#1](https://github.com/adamperkowski/nvrs/issues/1)) ([05faaca](https://github.com/adamperkowski/nvrs/commit/05faaca79dd1306a818864ab80ae028a0217dd1e))
 

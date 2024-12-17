@@ -52,7 +52,7 @@ commit_parsers = [
   { message = "^ui|^ux", group = "<!-- 5 -->🧩 UI/UX" },
   { message = "^doc", group = "<!-- 3 -->📚 Documentation" },
   { message = "^perf", group = "<!-- 4 -->⚡ Performance" },
-  { message = "^refact", group = "<!-- 2 -->⚙️ Refactoring" },
+  { message = "^refact", group = "<!-- 2 -->🛠️ Refactoring" },
   { message = "^test", group = "<!-- 6 -->🧪 Testing" },
   { message = "^chore\\(release\\): prepare for", skip = true },
   { message = "^chore\\(deps.*\\)", skip = true },

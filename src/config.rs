@@ -51,6 +51,10 @@ pub struct Package {
     #[serde(default)]
     #[serde(skip_serializing_if = "is_empty_string")]
     aur: String,
+    #[cfg(feature = "crates-io")]
+    #[serde(default)]
+    #[serde(skip_serializing_if = "is_empty_string")]
+    cratesio: String,
     #[cfg(feature = "github")]
     #[serde(default)]
     #[serde(skip_serializing_if = "is_empty_string")]
@@ -91,6 +95,11 @@ impl Package {
                 package.aur = target;
                 Ok(())
             }
+            #[cfg(feature = "crates-io")]
+            "cratesio" => {
+                package.cratesio = target;
+                Ok(())
+            }
             #[cfg(feature = "github")]
             "github" => {
                 package.github = target;
@@ -122,6 +131,8 @@ impl Package {
             host: String::new(),
             #[cfg(feature = "aur")]
             aur: String::new(),
+            #[cfg(feature = "crates-io")]
+            cratesio: String::new(),
             #[cfg(feature = "github")]
             github: String::new(),
             #[cfg(feature = "gitlab")]
@@ -153,6 +164,8 @@ impl Package {
         let args = match self.source.as_str() {
             #[cfg(feature = "aur")]
             "aur" => vec![self_ref.aur],
+            #[cfg(feature = "crates-io")]
+            "cratesio" => vec![self.cratesio.clone()],
             #[cfg(feature = "github")]
             "github" => vec![self_ref.github],
             #[cfg(feature = "gitlab")]
