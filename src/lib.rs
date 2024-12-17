@@ -23,9 +23,9 @@ pub mod verfiles;
 /// # tokio_test::block_on(async {
 /// use nvrs::*;
 ///
-/// let config = config::load(None).await.unwrap();
-/// let verfiles = verfiles::load(config.0.__config__.clone()).await.unwrap();
-/// let keyfile = keyfile::load(config.0.__config__.clone()).await.unwrap();
+/// let config = config::load(&None).await.unwrap();
+/// let verfiles = verfiles::load(&config.0.__config__).await.unwrap();
+/// let keyfile = keyfile::load(&config.0.__config__).await.unwrap();
 ///
 /// Core {
 ///     config,
@@ -48,14 +48,16 @@ pub struct Core {
 
 /// an asynchronous function that package's source and gets the latest release
 /// # example usage
-/// ```rust,ignore
+/// ```rust
 /// # tokio_test::block_on(async {
-/// use nvrs::run_source;
+/// use nvrs::{run_source, config};
 ///
 /// let package_name = "nvrs".to_string();
+/// let package = config::Package::new("github".to_string(), "adamperkowski/nvrs".to_string(), false, "v".to_string()).unwrap();
+///
 /// let client = reqwest::Client::new();
 ///
-/// run_source((package_name, package), client).await;
+/// run_source((package_name, package), client, None).await;
 /// # })
 /// ```
 /// see [crate::config::Package] for `package`
@@ -83,6 +85,6 @@ pub async fn run_source(
 
         Ok((api.func)(args).await?)
     } else {
-        Err(error::Error::SourceNotFound(source))
+        Err(error::Error::SourceNotFound(source.to_string()))
     }
 }

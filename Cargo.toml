@@ -1,6 +1,6 @@
 [package]
 name = "nvrs"
-version = "0.1.5"
+version = "0.1.6-pre1"
 authors = ["Adam Perkowski <adas1per@protonmail.com>"]
 license = "MIT"
 description = "🚦 fast new version checker for software releases 🦀"
@@ -20,7 +20,9 @@ include = [
 ]
 
 [features]
-nvrs_cli = ["clap", "colored", "futures"]
+nvrs_cli = ["clap", "pretty", "futures"]
+nvrs_tui = ["ratatui", "crossterm", "anyhow", "tachyonfx", "pretty", "futures"]
+pretty = ["colored"]
 default = ["aur", "crates-io", "github", "gitlab", "regex"]
 aur = []
 crates-io = []
@@ -30,22 +32,26 @@ regex = ["dep:regex"]
 
 [[bin]]
 name = "nvrs"
-path = "src/main.rs"
+path = "src/cli/main.rs"
 required-features = ["nvrs_cli"]
 
 [[bin]]
 name = "nvrs_tui"
-path = "src/tui.rs"
+path = "src/tui/main.rs"
 required-features = ["nvrs_tui"]
 
 [dependencies]
+anyhow = { version = "1.0.94", optional = true }
 clap = { version = "4.5.23", features = ["derive", "color", "error-context", "help", "std", "usage"], default-features = false , optional = true }
+crossterm = { version = "0.28.1", features = ["events", "event-stream"], default-features = false, optional = true }
 colored = { version = "2.2.0", optional = true }
 futures = { version = "0.3.31", optional = true }
+ratatui = { version =  "0.29.0", optional = true }
 regex = { version = "1.11.1", optional = true }
 reqwest = { version = "0.12.9", features = ["__tls", "charset", "default-tls", "h2", "http2", "json"], default-features = false }
 serde = { version = "1.0.216", features = ["derive"], default-features = false }
 serde_json = "1.0.132"
+tachyonfx = { version = "0.9.3", optional = true }
 thiserror = "2.0.7"
 tokio = { version = "1.42.0", features = ["full"] }
 toml = { version = "0.8.19", features = ["parse", "display"], default-features = false }

@@ -2,7 +2,11 @@
 
 All notable changes to nvrs will be documented in this file.
 
-## [upstream]
+## [0.1.6-pre1] - 2024-12-03
+
+### 🚀 Features
+
+- `--list-sources` command ([442c06f](https://github.com/adamperkowski/nvrs/commit/442c06f0e56f4adcc0c2ad44d042997cb088a930))
 
 ### 🚀 Features
 

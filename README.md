@@ -15,6 +15,8 @@
 ### [nvchecker](https://github.com/lilydjwg/nvchecker) compatibility
 check the [release notes](https://github.com/adamperkowski/nvrs/releases) and [configuration docs](#configuration) for compatibility updates and instructions.
 
+### TUI
+
 ### Speed
 <img align='right' src='https://media1.tenor.com/m/mMWXOkCEndoAAAAC/ka-chow-lightning-mcqueen.gif' alt='ka-chow' width=80 height=45>
 
