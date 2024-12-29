@@ -9,6 +9,7 @@ All notable changes to nvrs will be documented in this file.
 - `--list-sources` command ([442c06f](https://github.com/adamperkowski/nvrs/commit/442c06f0e56f4adcc0c2ad44d042997cb088a930))
 - (*sources*) add regex ([#13](https://github.com/adamperkowski/nvrs/issues/13)) ([fa12ce9](https://github.com/adamperkowski/nvrs/commit/fa12ce9691adbdcf51990eb8416aedf4fdc7d36b))
 - (*sources*) add crates.io ([78294ff](https://github.com/adamperkowski/nvrs/commit/78294ff44f26ce79df0c7c7c2511517627fc4a31))
+- (*sources*) add gitea ([4b015d5](https://github.com/adamperkowski/nvrs/commit/4b015d55f4064b8a735bd87a2e1c879cff5bd86c))
 
 ### 🐛 Bug Fixes
 
@@ -29,6 +30,7 @@ All notable changes to nvrs will be documented in this file.
 ### ⚙️ Miscellaneous Tasks
 
 - (*repo*) fix dependabot ([432b10f](https://github.com/adamperkowski/nvrs/commit/432b10f32199ecd7a33c2d9643a5e1f512db862c))
+- (*ci*) remove `cliff.yml` ([f57c3ab](https://github.com/adamperkowski/nvrs/commit/f57c3ab39fc9a3db68cbd26fc7ac6a93b1c89c20))
 
 ### Other (unconventional)
 
