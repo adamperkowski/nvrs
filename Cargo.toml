@@ -21,9 +21,10 @@ include = [
 
 [features]
 nvrs_cli = ["clap", "colored", "futures"]
-default = ["aur", "crates-io", "github", "gitlab", "regex"]
+default = ["aur", "crates-io", "gitea", "github", "gitlab", "regex"]
 aur = []
 crates-io = []
+gitea = []
 github = []
 gitlab = []
 regex = ["dep:regex"]

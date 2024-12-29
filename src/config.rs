@@ -55,6 +55,10 @@ pub struct Package {
     #[serde(default)]
     #[serde(skip_serializing_if = "is_empty_string")]
     cratesio: String,
+    #[cfg(feature = "gitea")]
+    #[serde(default)]
+    #[serde(skip_serializing_if = "is_empty_string")]
+    gitea: String,
     #[cfg(feature = "github")]
     #[serde(default)]
     #[serde(skip_serializing_if = "is_empty_string")]
@@ -100,6 +104,11 @@ impl Package {
                 package.cratesio = target;
                 Ok(())
             }
+            #[cfg(feature = "gitea")]
+            "gitea" => {
+                package.gitea = target;
+                Ok(())
+            }
             #[cfg(feature = "github")]
             "github" => {
                 package.github = target;
@@ -133,6 +142,8 @@ impl Package {
             aur: String::new(),
             #[cfg(feature = "crates-io")]
             cratesio: String::new(),
+            #[cfg(feature = "gitea")]
+            gitea: String::new(),
             #[cfg(feature = "github")]
             github: String::new(),
             #[cfg(feature = "gitlab")]
@@ -161,6 +172,8 @@ impl Package {
             "aur" => vec![self.aur.clone()],
             #[cfg(feature = "crates-io")]
             "cratesio" => vec![self.cratesio.clone()],
+            #[cfg(feature = "gitea")]
+            "gitea" => vec![self.gitea.clone(), self.host.clone()],
             #[cfg(feature = "github")]
             "github" => vec![self.github.clone()],
             #[cfg(feature = "gitlab")]

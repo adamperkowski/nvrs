@@ -41,3 +41,9 @@ regex = '<td><strong>([\d.]+)</strong></td>'
 [nvrs]
 source = "cratesio"
 cratesio = "nvrs"
+
+[libkeccak]
+source = "gitea"
+host = "codeberg.org"
+gitea = "maandree/libkeccak"
+use_max_tag = true
