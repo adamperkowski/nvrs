@@ -4,6 +4,8 @@
 mod aur;
 #[cfg(feature = "crates-io")]
 mod crates_io;
+#[cfg(feature = "gitea")]
+mod gitea;
 #[cfg(feature = "github")]
 mod github;
 #[cfg(feature = "gitlab")]
@@ -76,6 +78,11 @@ pub const API_LIST: &[Api] = &[
     Api {
         name: "cratesio",
         func: crates_io::get_latest,
+    },
+    #[cfg(feature = "gitea")]
+    Api {
+        name: "gitea",
+        func: gitea::get_latest,
     },
     #[cfg(feature = "github")]
     Api {
