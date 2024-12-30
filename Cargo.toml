@@ -45,7 +45,7 @@ colored = { version = "2.2.0", optional = true }
 futures = { version = "0.3.31", optional = true }
 regex = { version = "1.11.1", optional = true }
 reqwest = { version = "0.12.11", features = ["__tls", "charset", "default-tls", "h2", "http2", "json"], default-features = false }
-serde = { version = "1.0.216", features = ["derive"], default-features = false }
+serde = { version = "1.0.217", features = ["derive"], default-features = false }
 serde_json = "1.0.134"
 thiserror = "2.0.9"
 tokio = { version = "1.42.0", features = ["full"] }
