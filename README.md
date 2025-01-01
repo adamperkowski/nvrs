@@ -177,6 +177,6 @@ if you find any parts of the code or the documentation unclear, or have any sugg
 
 <div align='center'>
 
-<sub align='center'>Copyright (c) 2024 Adam Perkowski<br>see [LICENSE](/LICENSE)</sub>
+<sub align='center'>Copyright (c) 2025 Adam Perkowski<br>see [LICENSE](/LICENSE)</sub>
 
 </div>
