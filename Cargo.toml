@@ -31,12 +31,12 @@ regex = ["dep:regex"]
 
 [[bin]]
 name = "nvrs"
-path = "src/main.rs"
+path = "src/cli/main.rs"
 required-features = ["nvrs_cli"]
 
 [[bin]]
 name = "nvrs_tui"
-path = "src/tui.rs"
+path = "src/tui/main.rs"
 required-features = ["nvrs_tui"]
 
 [dependencies]

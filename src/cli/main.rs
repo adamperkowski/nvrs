@@ -1,7 +1,8 @@
 use colored::Colorize;
+
 use nvrs::*;
 
-mod cli;
+mod args;
 
 #[tokio::main]
 async fn main() -> error::Result<()> {
@@ -19,21 +20,21 @@ async fn main() -> error::Result<()> {
 
             match res {
                 Ok(_) => (),
-                Err(e) => pretty_error(&e),
+                Err(e) => e.pretty(),
             }
         }
-        Err(e) => pretty_error(&e),
+        Err(e) => e.pretty(),
     }
 
     Ok(())
 }
 
-async fn init() -> error::Result<(Core, cli::Cli)> {
-    let cli = cli::get_args();
-    let config = config::load(cli.clone().custom_config).await?;
+async fn init() -> error::Result<(Core, args::Cli)> {
+    let cli = args::get_args();
+    let config = config::load(&cli.custom_config).await?;
 
-    let verfiles = verfiles::load(config.0.__config__.clone()).await?;
-    let keyfile = keyfile::load(config.0.__config__.clone()).await?;
+    let verfiles = verfiles::load(&config.0.__config__).await?;
+    let keyfile = keyfile::load(&config.0.__config__).await?;
 
     Ok((
         Core {
@@ -96,9 +97,11 @@ async fn take(core: Core, take_names: Option<Vec<String>>) -> error::Result<()> 
                         old_pkg.version.red(),
                         new_pkg.version.green()
                     );
-                    old_pkg.version = new_pkg.version.clone();
-                    old_pkg.gitref = new_pkg.gitref.clone();
-                    old_pkg.url = new_pkg.url.clone();
+
+                    let pkg = new_pkg.to_owned();
+                    old_pkg.version = pkg.version;
+                    old_pkg.gitref = pkg.gitref;
+                    old_pkg.url = pkg.url;
                 }
             } else {
                 println!(
@@ -108,14 +111,14 @@ async fn take(core: Core, take_names: Option<Vec<String>>) -> error::Result<()> 
                     "NONE".red(),
                     new_pkg.version.green()
                 );
-                oldver.data.data.insert(package_name, new_pkg.clone());
+                oldver.data.data.insert(package_name, new_pkg.to_owned());
             }
         } else {
             return Err(error::Error::PkgNotInNewver(package_name));
         }
     }
 
-    verfiles::save(oldver, true, config.0.__config__).await
+    verfiles::save(&oldver, true, &config.0.__config__).await
 }
 
 async fn nuke(core: Core, nuke_names: Option<Vec<String>>, no_fail: bool) -> error::Result<()> {
@@ -127,7 +130,7 @@ async fn nuke(core: Core, nuke_names: Option<Vec<String>>, no_fail: bool) -> err
         if config_content.packages.contains_key(&package_name) {
             config_content.packages.remove(&package_name);
         } else if no_fail {
-            pretty_error(&error::Error::PkgNotInConfig(package_name.clone()));
+            error::Error::PkgNotInConfig(package_name.clone()).pretty();
         } else {
             return Err(error::Error::PkgNotInConfig(package_name));
         }
@@ -135,9 +138,9 @@ async fn nuke(core: Core, nuke_names: Option<Vec<String>>, no_fail: bool) -> err
         oldver.data.data.remove(&package_name);
     }
 
-    verfiles::save(newver, false, config_content.__config__.clone()).await?;
-    verfiles::save(oldver, true, config_content.__config__.clone()).await?;
-    config::save(config_content, core.config.1).await?;
+    verfiles::save(&newver, false, &config_content.__config__).await?;
+    verfiles::save(&oldver, true, &config_content.__config__).await?;
+    config::save(&config_content, core.config.1).await?;
 
     Ok(())
 }
@@ -158,16 +161,16 @@ async fn sync(core: Core, no_fail: bool) -> error::Result<()> {
     for package in config.packages {
         match results.remove(0).unwrap() {
             Ok(release) => {
-                if let Some(new_pkg) = newver.data.data.iter_mut().find(|p| p.0 == &package.0) {
-                    let gitref: String;
-                    let tag = if let Some(t) = release.tag.clone() {
-                        gitref = format!("refs/tags/{}", t);
-                        release.tag.unwrap().replacen(&package.1.prefix, "", 1)
-                    } else {
-                        gitref = String::new();
-                        release.name
-                    };
+                let gitref: String;
+                let tag = if let Some(t) = release.tag.clone() {
+                    gitref = format!("refs/tags/{}", t);
+                    release.tag.unwrap().replacen(&package.1.prefix, "", 1)
+                } else {
+                    gitref = String::new();
+                    release.name
+                };
 
+                if let Some(new_pkg) = newver.data.data.iter_mut().find(|p| p.0 == &package.0) {
                     if new_pkg.1.version != tag {
                         println!(
                             "{} {} {} -> {}",
@@ -176,20 +179,12 @@ async fn sync(core: Core, no_fail: bool) -> error::Result<()> {
                             new_pkg.1.version.red(),
                             tag.green()
                         );
-                        new_pkg.1.version = tag.clone();
+
+                        new_pkg.1.version = tag;
                         new_pkg.1.gitref = gitref;
                         new_pkg.1.url = release.url;
                     }
                 } else {
-                    let gitref: String;
-                    let tag = if let Some(t) = release.tag.clone() {
-                        gitref = format!("refs/tags/{}", t);
-                        release.tag.unwrap().replacen(&package.1.prefix, "", 1)
-                    } else {
-                        gitref = String::new();
-                        release.name
-                    };
-
                     println!(
                         "{} {} {} -> {}",
                         "|".white().on_black(),
@@ -197,10 +192,11 @@ async fn sync(core: Core, no_fail: bool) -> error::Result<()> {
                         "NONE".red(),
                         tag.green()
                     );
+
                     newver.data.data.insert(
                         package.0,
                         verfiles::VerPackage {
-                            version: tag.clone(),
+                            version: tag,
                             gitref,
                             url: release.url,
                         },
@@ -211,36 +207,13 @@ async fn sync(core: Core, no_fail: bool) -> error::Result<()> {
                 if !no_fail {
                     return Err(e);
                 } else {
-                    pretty_error(&e);
+                    e.pretty();
                 }
             }
         };
     }
 
-    verfiles::save(newver, false, config.__config__).await
-}
-
-fn pretty_error(err: &error::Error) {
-    let mut lines: Vec<String> = err
-        .to_string()
-        .lines()
-        .map(|line| line.to_string())
-        .collect();
-    let first = lines.remove(0);
-    let first_split = first.split_once(':').unwrap_or(("", &first));
-    if first_split.0.is_empty() {
-        println!("{} {}", "!".red().bold().on_black(), first_split.1.red());
-    } else {
-        println!(
-            "{} {}:{}",
-            "!".red().bold().on_black(),
-            first_split.0,
-            first_split.1.red()
-        );
-    }
-    for line in lines {
-        println!("{}  {}", "!".red().on_black(), line)
-    }
+    verfiles::save(&newver, false, &config.__config__).await
 }
 
 #[tokio::test]

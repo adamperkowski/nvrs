@@ -41,15 +41,15 @@ pub struct Verfile {
 }
 
 /// load the verfiles specified in [crate::config::ConfigTable]
-pub async fn load(config_table: Option<config::ConfigTable>) -> error::Result<(Verfile, Verfile)> {
-    let config_table = config_table.ok_or(error::Error::NoConfigTable)?;
+pub async fn load(config_table: &Option<config::ConfigTable>) -> error::Result<(Verfile, Verfile)> {
+    let config_table = config_table.to_owned().ok_or(error::Error::NoConfigTable)?;
 
-    let oldver_path = config_table.oldver.as_ref().ok_or(error::Error::NoXVer)?;
-    let newver_path = config_table.newver.as_ref().ok_or(error::Error::NoXVer)?;
+    let oldver_path = config_table.oldver.ok_or(error::Error::NoXVer)?;
+    let newver_path = config_table.newver.ok_or(error::Error::NoXVer)?;
 
     let (oldver, newver) = tokio::try_join!(
-        load_file(Path::new(oldver_path)),
-        load_file(Path::new(newver_path))
+        load_file(Path::new(&oldver_path)),
+        load_file(Path::new(&newver_path))
     )?;
 
     if oldver.version != 2 || newver.version != 2 {
@@ -61,18 +61,18 @@ pub async fn load(config_table: Option<config::ConfigTable>) -> error::Result<(V
 
 /// save changes to the verfiles
 pub async fn save(
-    verfile: Verfile,
+    verfile: &Verfile,
     is_oldver: bool,
-    config_table: Option<config::ConfigTable>,
+    config_table: &Option<config::ConfigTable>,
 ) -> error::Result<()> {
-    let config_table = config_table.ok_or(error::Error::NoConfigTable)?;
+    let config_table = config_table.to_owned().ok_or(error::Error::NoConfigTable)?;
     let path = if is_oldver {
-        config_table.oldver.as_ref().ok_or(error::Error::NoXVer)?
+        config_table.oldver.ok_or(error::Error::NoXVer)?
     } else {
-        config_table.newver.as_ref().ok_or(error::Error::NoXVer)?
+        config_table.newver.ok_or(error::Error::NoXVer)?
     };
 
-    let mut file = fs::File::create(Path::new(path)).await?;
+    let mut file = fs::File::create(Path::new(&path)).await?;
     let content = format!("{}\n", serde_json::to_string_pretty(&verfile)?);
 
     file.write_all(content.as_bytes()).await?;

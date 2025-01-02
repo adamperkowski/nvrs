@@ -160,35 +160,40 @@ impl Package {
     /// global function to get various API-specific agrs for a package
     ///
     /// # example
-    /// ```rust,ignore
-    /// // package has `source = "github"` * `github = "adamperkowski/nvrs"` specified
+    /// ```rust
+    /// use nvrs::config::Package;
+    ///
+    /// let package = Package::new("github".to_string(), "adamperkowski/nvrs".to_string(),
+    /// false, "v".to_string()).unwrap();
+    ///
     /// let args = package.get_api();
     ///
-    /// assert_eq!(package, ("github", vec!["adamperkowski/nvrs"]))
+    /// assert_eq!(args, ("github".to_string(), vec!["adamperkowski/nvrs".to_string()]))
     /// ```
     pub fn get_api(&self) -> (String, Vec<String>) {
+        let self_ref = self.to_owned();
         let args = match self.source.as_str() {
             #[cfg(feature = "aur")]
-            "aur" => vec![self.aur.clone()],
+            "aur" => vec![self_ref.aur],
             #[cfg(feature = "crates-io")]
-            "cratesio" => vec![self.cratesio.clone()],
+            "cratesio" => vec![self_ref.cratesio],
             #[cfg(feature = "gitea")]
-            "gitea" => vec![self.gitea.clone(), self.host.clone()],
+            "gitea" => vec![self_ref.gitea, self_ref.host],
             #[cfg(feature = "github")]
-            "github" => vec![self.github.clone()],
+            "github" => vec![self_ref.github],
             #[cfg(feature = "gitlab")]
-            "gitlab" => vec![self.gitlab.clone(), self.host.clone()],
+            "gitlab" => vec![self_ref.gitlab, self_ref.host],
             #[cfg(feature = "regex")]
-            "regex" => vec![self.url.clone(), self.regex.clone()],
+            "regex" => vec![self_ref.url, self_ref.regex],
             _ => vec![],
         };
 
-        (self.source.clone(), args)
+        (self_ref.source, args)
     }
 }
 
 /// global asynchronous function to load all config files
-pub async fn load(custom_path: Option<String>) -> error::Result<(Config, PathBuf)> {
+pub async fn load(custom_path: &Option<String>) -> error::Result<(Config, PathBuf)> {
     let config_path = if let Some(path) = custom_path {
         let path = Path::new(&path);
         if path.exists() && path.is_file() {
@@ -226,7 +231,7 @@ pub async fn load(custom_path: Option<String>) -> error::Result<(Config, PathBuf
 
 // FIXME: this nukes all the comments
 /// global asynchronous function to save the config file
-pub async fn save(config_content: Config, path: PathBuf) -> error::Result<()> {
+pub async fn save(config_content: &Config, path: PathBuf) -> error::Result<()> {
     let mut file = fs::File::create(path).await?;
     let content = format!("{}\n", toml::to_string(&config_content)?);
     file.write_all(content.as_bytes()).await?;
@@ -245,7 +250,7 @@ mod tests {
 
     #[tokio::test]
     async fn loading() {
-        let config = load(None).await.unwrap();
+        let config = load(&None).await.unwrap();
 
         assert_eq!(config.1, PathBuf::from("nvrs.toml"));
     }
