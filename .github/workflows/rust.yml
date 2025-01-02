@@ -32,9 +32,7 @@ jobs:
         run: cargo fmt --all --check
 
       - name: cargo clippy
-        run: |
-          cargo clippy -- -Dwarnings
-          cargo clippy --release -- -Dwarnings
+        run: cargo clippy --all-features -- -Dwarnings
 
   build:
     runs-on: ubuntu-latest
@@ -45,8 +43,8 @@ jobs:
 
       - name: Build
         run: |
-          cargo build --verbose
-          cargo build --release --verbose
+          cargo build --all-features --verbose
+          cargo build --all-features --release --verbose
 
   test:
     runs-on: ubuntu-latest
