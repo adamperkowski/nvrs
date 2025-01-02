@@ -1,6 +1,6 @@
 [package]
 name = "nvrs"
-version = "0.1.5"
+version = "0.1.6-pre1"
 authors = ["Adam Perkowski <adas1per@protonmail.com>"]
 license = "MIT"
 description = "🚦 fast new version checker for software releases 🦀"
@@ -21,6 +21,7 @@ include = [
 
 [features]
 nvrs_cli = ["clap", "colored", "futures"]
+nvrs_tui = ["ratatui", "colored", "crossterm", "anyhow", "tachyonfx", "futures"]
 default = ["aur", "crates-io", "gitea", "github", "gitlab", "regex"]
 aur = []
 crates-io = []
@@ -40,13 +41,17 @@ path = "src/tui/main.rs"
 required-features = ["nvrs_tui"]
 
 [dependencies]
+anyhow = { version = "1.0.94", optional = true }
 clap = { version = "4.5.23", features = ["derive", "color", "error-context", "help", "std", "usage"], default-features = false , optional = true }
 colored = { version = "2.2.0", optional = true }
+crossterm = { version = "0.28.1", features = ["events", "event-stream"], default-features = false, optional = true }
 futures = { version = "0.3.31", optional = true }
+ratatui = { version =  "0.29.0", optional = true }
 regex = { version = "1.11.1", optional = true }
 reqwest = { version = "0.12.11", features = ["__tls", "charset", "default-tls", "h2", "http2", "json"], default-features = false }
 serde = { version = "1.0.217", features = ["derive"], default-features = false }
 serde_json = "1.0.134"
+tachyonfx = { version = "0.9.3", optional = true }
 thiserror = "2.0.9"
 tokio = { version = "1.42.0", features = ["full"] }
 toml = { version = "0.8.19", features = ["parse", "display"], default-features = false }
