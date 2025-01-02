@@ -1,6 +1,6 @@
 [package]
 name = "nvrs"
-version = "0.1.5"
+version = "0.1.6"
 authors = ["Adam Perkowski <adas1per@protonmail.com>"]
 license = "MIT"
 description = "🚦 fast new version checker for software releases 🦀"

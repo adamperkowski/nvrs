@@ -2,7 +2,7 @@
 
 All notable changes to nvrs will be documented in this file.
 
-## [upstream]
+## [0.1.6] - 2025-01-02
 
 ### 🚀 Features
 
@@ -27,10 +27,15 @@ All notable changes to nvrs will be documented in this file.
 - (*README*) update cargo install instructions ([88f0fdc](https://github.com/adamperkowski/nvrs/commit/88f0fdce435c50df44c3ae2cfd5d1087df4376fc))
 - improve the wording ([c47df3d](https://github.com/adamperkowski/nvrs/commit/c47df3dbe342bacc79ba2099f17365f07555cdd3))
 
+### ⚡ Performance
+
+- reduce cloning & improve overall performance ([0777ef2](https://github.com/adamperkowski/nvrs/commit/0777ef24b54f056d7bd66c8b932b478cbbc3eb66))
+
 ### ⚙️ Miscellaneous Tasks
 
 - (*repo*) fix dependabot ([432b10f](https://github.com/adamperkowski/nvrs/commit/432b10f32199ecd7a33c2d9643a5e1f512db862c))
 - (*ci*) remove `cliff.yml` ([f57c3ab](https://github.com/adamperkowski/nvrs/commit/f57c3ab39fc9a3db68cbd26fc7ac6a93b1c89c20))
+- update copyright year ([98f8f6d](https://github.com/adamperkowski/nvrs/commit/98f8f6dee86e2b2c1a90c5b83bb54d7985cf466b))
 
 ### Other (unconventional)
 
