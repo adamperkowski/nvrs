@@ -33,7 +33,7 @@ pub struct ConfigTable {
     /// path to the `newver` file
     pub newver: Option<String>,
     /// path to the keyfile
-    pub keyfile: Option<String>,
+    pub(crate) keyfile: Option<String>,
 }
 
 /// package entry structure
@@ -76,7 +76,7 @@ pub struct Package {
 
     /// whether to use the latest tag instead of the latest release
     #[serde(default)]
-    pub use_max_tag: Option<bool>,
+    pub(crate) use_max_tag: Option<bool>,
     /// prefix to add to the version name
     #[serde(default)]
     #[serde(skip_serializing_if = "is_empty_string")]

@@ -18,11 +18,11 @@ pub struct Api {
     /// name of the API
     pub name: &'static str,
     /// pointer to the API's `get_latest` function
-    pub func: fn(ApiArgs) -> ReleaseFuture,
+    pub(crate) func: fn(ApiArgs) -> ReleaseFuture,
 }
 
 /// arguments passed to a source
-pub struct ApiArgs {
+pub(crate) struct ApiArgs {
     pub request_client: reqwest::Client,
     /// name of the package
     pub package: String,
