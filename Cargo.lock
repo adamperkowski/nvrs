@@ -986,6 +986,7 @@ dependencies = [
  "colored",
  "criterion",
  "futures",
+ "nvrs",
  "regex",
  "reqwest",
  "serde",
