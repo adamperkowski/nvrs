@@ -2,6 +2,18 @@
 
 All notable changes to nvrs will be documented in this file.
 
+## [0.1.7-pre1] - 2025-01-06
+
+### 📚 Documentation
+
+- (*PR*) remove changelog requirement ([b61129d](https://github.com/adamperkowski/nvrs/commit/b61129d53cff5b608b01fbf83650d917765bdce9))
+- (*issue_template*) add templates ([e603590](https://github.com/adamperkowski/nvrs/commit/e603590cf97aeabef9933b762e239a54ab72f40e))
+- (*mdbook*) we're up ([#29](https://github.com/adamperkowski/nvrs/issues/29)) ([154792d](https://github.com/adamperkowski/nvrs/commit/154792d75e76beb636af1807ec1e8114a8c4af64))
+
+### ⚙️ Miscellaneous Tasks
+
+- improve secret security by using `pub(crate)` ([9baee92](https://github.com/adamperkowski/nvrs/commit/9baee9208c72c9544f68140b421ca3a28f0ec510))
+
 ## [0.1.6] - 2025-01-02
 
 ### 🚀 Features
