@@ -1,0 +1,68 @@
+name: feature request
+description: request a new feature for nvrs
+labels: ['enhancement']
+body:
+  - type: markdown
+    attributes:
+      value: |
+        fill out the sections below to help us understand your request
+
+  - type: textarea
+    id: summary
+    attributes:
+      label: summary
+      description: a clear description of the feature
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: the problem
+      description: is this request related to a problem? please describe
+    validations:
+      required: false
+
+  - type: textarea
+    id: usecase
+    attributes:
+      label: use case
+      description: describe the use case for this feature
+    validations:
+      required: false
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: additional context
+      description: add any other context or information avout this feature
+    validations:
+      required: false
+
+  - type: dropdown
+    id: severity
+    attributes:
+      label: importance
+      description: the level of importance
+      options:
+        - low
+        - medium
+        - high
+        - critical
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: checklist
+      description: check all that apply
+      options:
+        - label: 'i have checked the documentation'
+          required: true
+        - label: 'i have read the Code of Conduct'
+          required: true
+        - label: 'there are no known workarounds'
+          required: false
+        - label: 'there are no already existing issues or pull requests for this feature'
+          required: true

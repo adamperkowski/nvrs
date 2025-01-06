@@ -1,0 +1,92 @@
+name: bug report
+description: report a bug to help us improve
+labels: ['bug']
+body:
+  - type: markdown
+    attributes:
+      value: |
+        fill out the sections below to help us diagnose and fix the issue
+
+  - type: textarea
+    id: summary
+    attributes:
+      label: summary
+      description: a clear description of what went wrong
+    validations:
+      required: true
+
+  - type: textarea
+    id: to_reproduce
+    attributes:
+      label: to reproduce
+      description: list all steps required to reproduce the behavior
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected_behavior
+    attributes:
+      label: expected behavior
+      description: what did you expect to happen
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual_behavior
+    attributes:
+      label: actual behavior
+      description: detailed description of what actually happened
+    validations:
+      required: true
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: additional context
+      description: add any other context, screenshots, or logs to help us debug the issue
+    validations:
+      required: false
+
+  - type: dropdown
+    id: severity
+    attributes:
+      label: severity
+      description: the level of importance
+      options:
+        - low
+        - medium
+        - high
+        - critical
+    validations:
+      required: true
+
+  - type: dropdown
+    id: os
+    attributes:
+      label: OS
+      description: the operating system where the bug occurred
+      multiple: true
+      options:
+        - Linux
+        - MacOS
+        - Windows
+        - Other
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: checklist
+      description: check all that apply
+      options:
+        - label: 'i have checked the documentation'
+          required: true
+        - label: 'i have read the Code of Conduct'
+          required: true
+        - label: 'this is NOT a secutity vulnerability (refer to SECUTITY.md)'
+          required: true
+        - label: 'there are no known workarounds'
+          required: false
+        - label: 'there are no already existing issues or pull requests for this bug'
+          required: true
