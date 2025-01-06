@@ -25,6 +25,5 @@
 - [ ] I made corresponding changes to the documentation.
 - [ ] I formatted the code with [rustfmt](https://github.com/rust-lang/rustfmt).
 - [ ] I checked the lints with [clippy](https://github.com/rust-lang/rust-clippy).
-- [ ] I generated the changelog with [git-cliff](https://github.com/orhub/git-cliff).
 
 <!-- Thank you for contributing! -->
