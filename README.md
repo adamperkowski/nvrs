@@ -41,56 +41,10 @@ check the [release notes](https://github.com/adamperkowski/nvrs/releases) and [c
 ## Installation
 <a href="https://repology.org/project/nvrs/versions"><img align="right" src="https://repology.org/badge/vertical-allrepos/nvrs.svg" alt="Packaging status"></a>
 
-<details>
-<summary>Arch Linux</summary>
-
-[nvrs](https://aur.archlinux.org/packages/nvrs) is available as a package in the [AUR](https://aur.archlinux.org).<br>
-you can install it with your preferred [AUR helper](https://wiki.archlinux.org/title/AUR_helpers), example:
-
-```sh
-paru -S nvrs
-```
-
-or manually:
-
-```sh
-git clone https://aur.archlinux.org/nvrs.git
-cd nvrs
-makepkg -si
-```
-
-</details>
-
-<details>
-<summary>Cargo</summary>
-
-[nvrs](https://crates.io/crates/nvrs) can be installed via [Cargo](https://doc.rust-lang.org/cargo) with:
-
-```sh
-cargo install nvrs --all-features
-```
-
-note that crates installed using `cargo install` require manual updating with `cargo install --force`.
-
-</details>
-
-<details>
-<summary>Manual</summary>
-
-1. download the latest binary from [GitHub's release page](https://github.com/adamperkowski/nvrs/releases/latest)
-2. allow execution
-```sh
-chmod +x nvrs
-```
-3. move the file to a directory in `$PATH` (using `/usr/bin` as an example)
-```sh
-sudo mv nvrs /usr/bin/nvrs
-```
-
-</details>
+see the [installation guide](https://nvrs.adamperkowski.dev/installation.html) for instructions on how to install nvrs.
 
 ## Usage
-nvrs relies on a configuration file. see [configuration](#configuration). 
+nvrs relies on a configuration file. see [configuration](https://nvrs.adamperkowski.dev/configuration.html). 
 
 <img align='center' src='https://vhs.charm.sh/vhs-7j0ZLSJUnq5W8xwqjK14W4.gif' alt='Packaging status'>
 
@@ -118,55 +72,11 @@ nvrs -t ALL
 
 for all available commands, options and flags, see `nvrs --help` and the [manual page](/man/nvrs.1).
 
-## Configuration
-nvrs relies on a configuration file ([example](/nvrs.toml)) containing basic settings, such as `oldver`, `newver` & `keyfile` paths, as well as [package entries](#package-entries). supported config paths:
-- `$XDG_CONFIG_HOME/nvrs.toml` (`~/.config/nvrs.toml` if the variable is not set)
-- `./nvrs.toml`
-- custom paths set with `nvrs --config`
-
-### `__config__` table
-this configures the behavior of nvrs. see the [example config](/nvrs.toml#L7-L10).
-
-available fields:
-
-| name      | description                                                     | type   | required |
-|-----------|-----------------------------------------------------------------|--------|----------|
-| `oldver`  | path to the `oldver` file                                       | string | ✔️       |
-| `newver`  | path to the `newver` file                                       | string | ✔️       |
-| `keyfile` | path to a keyfile (see [keyfile structure](#keyfile-structure)) | string | ❌       |
-
-### Package entries
-
-[example](/nvrs.toml#L12-L15)
-
-package entries are custom entries in the main config file. they contain values such as:
-
-| name          | description                                                               | type   | required | custom |
-|---------------|---------------------------------------------------------------------------|--------|----------|--------|
-| `source`      | see [sources](#sources)                                                   | string | ✔️       | ❌     |
-| source name   | the "target". eg. repo path for `github`                                  | string | ✔️       | ✔️     |
-| `host`        | domain name the source is hosted on                                       | string | ❌       | ❌     |
-| `prefix`      | the prefix used in releases / tags<br>example: `v` for tags like `v0.1.0` | string | ❌       | ❌     |
-| `use_max_tag` | use max git tag instead of the latest release                             | bool   | ❌       | ❌     |
-| `url`         | url to check for source type `regex`                                      | string | ❌       | ❌     |
-| `regex`       | regex to search url for source type `regex`                               | bool   | ❌       | ❌     |
-
-### Keyfile structure
-this file contains API keys for various [sources](#sources). example can be found [here](/n_keyfile.toml).
-
-```toml
-[keys]
-github = "your_secret_github_api_key_that_you_shouldnt_push_to_a_public_nor_a_private_remote_repo_because_there_will_definitely_be_serious_consequences_sooner_or_later_if_you_do_trust_me_just_dont"
-gitlab = "remember_to_replace_the_example_values_here_here_with_your_actual_keys_otherwise_it_wont_work_but_dont_push_keyfiles_to_remote_repos"
-```
-
-<sub align='center'>"<i>I think that example value is not long enough</i>" - orhun</sub>
-
 ## Documentation
-the nvrs library documentation can be found at [docs.rs/nvrs](https://docs.rs/nvrs/latest/nvrs)
+full documentation can be found at [nvrs.adamperkowski.dev](https://nvrs.adamperkowski.dev).
+nvrs library documentation can be found at [docs.rs/nvrs](https://docs.rs/nvrs/latest/nvrs)
 
 ## Contributing
-
 if you want to contribute to the project, please read the [Contributing Guidelines](/CONTRIBUTING.md) before doing so.
 
 if you find any parts of the code or the documentation unclear, or have any suggestions, feel free to [open an issue](https://github.com/adamperkowski/nvrs/issues/new/choose) or a [pull request](https://github.com/adamperkowski/nvrs/pull/new).
