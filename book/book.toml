@@ -1,0 +1,17 @@
+[book]
+authors = ["Adam Perkowski"]
+language = "en"
+multilingual = false
+src = "src"
+title = "nvrs"
+
+[output.html]
+cname = "nvrs.adamperkowski.dev"
+default-theme = "nvrs"
+preferred-dark-theme = "nvrs"
+git-repository-url = "https://github.com/adamperkowski/nvrs"
+edit-url-template = "https://github.com/adamperkowski/nvrs/edit/main/book/{path}"
+additional-css = ["./theme/custom.css"]
+
+[output.html.search]
+use-boolean-and = true

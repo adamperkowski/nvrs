@@ -1,0 +1,47 @@
+name: mdBook
+
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - '*'
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup mdBook
+        uses: peaceiris/actions-mdbook@v2
+        with:
+          mdbook-version: 'latest'
+
+      - run: mdbook build book
+
+      - name: Set output directory
+        run: |
+          OUTDIR=$(basename ${{ github.ref }})
+          echo "OUTDIR=$OUTDIR" >> $GITHUB_ENV
+
+      - name: Deploy stable
+        uses: peaceiris/actions-gh-pages@v4
+        if: startswith(github.ref, 'refs/tags/')
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./book/book
+
+      - name: Deploy
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./book/book
+          destination_dir: ./${{ env.OUTDIR }}

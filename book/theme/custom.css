@@ -1,0 +1,436 @@
+/* Globals */
+
+:root {
+    --sidebar-width: 300px;
+    --sidebar-resize-indicator-width: 8px;
+    --sidebar-resize-indicator-space: 2px;
+    --page-padding: 15px;
+    --content-max-width: 750px;
+    --menu-bar-height: 50px;
+    --mono-font: "Source Code Pro", Consolas, "Ubuntu Mono", Menlo, "DejaVu Sans Mono", monospace, monospace;
+    --code-font-size: 0.875em /* please adjust the ace font size accordingly in editor.js */
+}
+
+::selection {
+    background: #6E1D57;
+    color: #00050D;
+}
+
+/* Themes */
+
+.nvrs {
+    --bg: #00050D;
+    --fg: #A3A3A3;
+
+    --sidebar-bg: #000D19;
+    --sidebar-fg: #A3A3A3;
+    --sidebar-non-existant: #A3A3A3;
+    --sidebar-active: #A01576;
+    --sidebar-spacer: #00050D;
+
+    --scrollbar: var(--sidebar-fg);
+
+    --icons: #A3A3A3;
+    --icons-hover: #A3A3A3;
+
+    --links: #1A76A8;
+
+    --inline-code-color: #A3A3A3;
+
+    --theme-popup-bg: #000D19;
+    --theme-popup-border: #0C567E;
+    --theme-hover: #6E1D57;
+
+    --quote-bg: #000D19;
+    --quote-border: #0C567E;
+
+    --warning-border: #7D0C0C;
+
+    --table-border-color: #000D19;
+    --table-header-bg: #00050D;
+    --table-alternate-bg: #000D19;
+
+    --searchbar-border-color: #0C567E;
+    --searchbar-bg: #000D19;
+    --searchbar-fg: #A3A3A3;
+    --searchbar-shadow-color: #aaa;
+    --searchresults-header-fg: #666;
+    --searchresults-border-color: #98a3ad;
+    --searchresults-li-bg: #2b2b2f;
+    --search-mark-bg: #0C567E;
+
+    --color-scheme: dark;
+
+    /* Same as `--icons` */
+    --copy-button-filter: invert(26%) sepia(8%) saturate(575%) hue-rotate(169deg) brightness(87%) contrast(82%);
+    /* Same as `--sidebar-active` */
+    --copy-button-filter-hover: invert(36%) sepia(70%) saturate(503%) hue-rotate(167deg) brightness(98%) contrast(89%);
+}
+
+/* https://highlightjs.readthedocs.io/en/latest/css-classes-reference.html */
+.nvrs code {
+  color: #A3A3A3;
+  background: #000D19;
+}
+.nvrs.hljs {
+  color: #A3A3A3;
+  background: #000D19;
+}
+.nvrs .hljs-keyword {
+  color: #6E1D57;
+}
+.nvrs .hljs-built_in {
+  color: #951313;
+}
+.nvrs .hljs-type {
+  color: #ABA119;
+}
+.nvrs .hljs-literal {
+  color: #7D750C;
+}
+.nvrs .hljs-number {
+  color: #7D750C;
+}
+.nvrs .hljs-operator {
+  color: #188AA9;
+}
+.nvrs .hljs-punctuation {
+  color: #A3A3A3;
+}
+.nvrs .hljs-property {
+  color: #12748F;
+}
+.nvrs .hljs-regexp {
+  color: #A01576;
+}
+.nvrs .hljs-string {
+  color: #16A85F;
+}
+.nvrs .hljs-char.escape_ {
+  color: #16A85F;
+}
+.nvrs .hljs-subst {
+  color: #A3A3A3;
+}
+.nvrs .hljs-symbol {
+  color: #ABA119;
+}
+.nvrs .hljs-variable {
+  color: #6E1D57;
+}
+.nvrs .hljs-variable.language_ {
+  color: #6E1D57;
+}
+.nvrs .hljs-variable.constant_ {
+  color: #7D750C;
+}
+.nvrs .hljs-title {
+  color: #1A76A8;
+}
+.nvrs .hljs-title.class_ {
+  color: #ABA119;
+}
+.nvrs .hljs-title.function_ {
+  color: #1A76A8;
+}
+.nvrs .hljs-params {
+  color: #A3A3A3;
+}
+.nvrs .hljs-comment {
+  color: #A3A3A3;
+}
+.nvrs .hljs-doctag {
+  color: #951313;
+}
+.nvrs .hljs-meta {
+  color: #7D750C;
+}
+.nvrs .hljs-section {
+  color: #0C567E;
+}
+.nvrs .hljs-tag {
+  color: #188AA9;
+}
+.nvrs .hljs-name {
+  color: #6E1D57;
+}
+.nvrs .hljs-attr {
+  color: #12748F;
+}
+.nvrs .hljs-attribute {
+  color: #16A85F;
+}
+.nvrs .hljs-bullet {
+  color: #188AA9;
+}
+.nvrs .hljs-code {
+  color: #16A85F;
+}
+.nvrs .hljs-emphasis {
+  color: #951313;
+  font-style: italic;
+}
+.nvrs .hljs-strong {
+  color: #951313;
+  font-weight: bold;
+}
+.nvrs .hljs-formula {
+  color: #188AA9;
+}
+.nvrs .hljs-link {
+  color: #12748F;
+  font-style: italic;
+}
+.nvrs .hljs-quote {
+  color: #16A85F;
+  font-style: italic;
+}
+.nvrs .hljs-selector-tag {
+  color: #ABA119;
+}
+.nvrs .hljs-selector-id {
+  color: #89b4fa;
+}
+.nvrs .hljs-selector-class {
+  color: #0C567E;
+}
+.nvrs .hljs-selector-attr {
+  color: #6E1D57;
+}
+.nvrs .hljs-selector-pseudo {
+  color: #0C567E;
+}
+.nvrs .hljs-template-tag {
+  color: #ABA119;
+}
+.nvrs .hljs-template-variable {
+  color: #ABA119;
+}
+.nvrs .hljs-addition {
+  color: #16A85F;
+  background: rgba(166, 227, 161, 0.15);
+}
+.nvrs .hljs-deletion {
+  color: #951313;
+  background: rgba(243, 139, 168, 0.15);
+}
+.nvrs blockquote blockquote {
+  border-top: 0.1em solid #A3A3A3;
+  border-bottom: 0.1em solid #A3A3A3;
+}
+.nvrs hr {
+  border-color: #A3A3A3;
+  border-style: solid;
+}
+.nvrs del {
+  color: #A3A3A3;
+}
+.nvrs .ace_gutter {
+  color: #A3A3A3;
+  background: #181825;
+}
+
+
+/* https://highlightjs.readthedocs.io/en/latest/css-classes-reference.html */
+.mocha.hljs {
+  color: #cdd6f4;
+  background: #1e1e2e;
+}
+.mocha .hljs-keyword {
+  color: #cba6f7;
+}
+.mocha .hljs-built_in {
+  color: #f38ba8;
+}
+.mocha .hljs-type {
+  color: #f9e2af;
+}
+.mocha .hljs-literal {
+  color: #fab387;
+}
+.mocha .hljs-number {
+  color: #fab387;
+}
+.mocha .hljs-operator {
+  color: #89dceb;
+}
+.mocha .hljs-punctuation {
+  color: #bac2de;
+}
+.mocha .hljs-property {
+  color: #94e2d5;
+}
+.mocha .hljs-regexp {
+  color: #f5c2e7;
+}
+.mocha .hljs-string {
+  color: #a6e3a1;
+}
+.mocha .hljs-char.escape_ {
+  color: #a6e3a1;
+}
+.mocha .hljs-subst {
+  color: #a6adc8;
+}
+.mocha .hljs-symbol {
+  color: #f2cdcd;
+}
+.mocha .hljs-variable {
+  color: #cba6f7;
+}
+.mocha .hljs-variable.language_ {
+  color: #cba6f7;
+}
+.mocha .hljs-variable.constant_ {
+  color: #fab387;
+}
+.mocha .hljs-title {
+  color: #89b4fa;
+}
+.mocha .hljs-title.class_ {
+  color: #f9e2af;
+}
+.mocha .hljs-title.function_ {
+  color: #89b4fa;
+}
+.mocha .hljs-params {
+  color: #cdd6f4;
+}
+.mocha .hljs-comment {
+  color: #9399b2;
+}
+.mocha .hljs-doctag {
+  color: #f38ba8;
+}
+.mocha .hljs-meta {
+  color: #fab387;
+}
+.mocha .hljs-section {
+  color: #89b4fa;
+}
+.mocha .hljs-tag {
+  color: #94e2d5;
+}
+.mocha .hljs-name {
+  color: #cba6f7;
+}
+.mocha .hljs-attr {
+  color: #89b4fa;
+}
+.mocha .hljs-attribute {
+  color: #a6e3a1;
+}
+.mocha .hljs-bullet {
+  color: #94e2d5;
+}
+.mocha .hljs-code {
+  color: #a6e3a1;
+}
+.mocha .hljs-emphasis {
+  color: #f38ba8;
+  font-style: italic;
+}
+.mocha .hljs-strong {
+  color: #f38ba8;
+  font-weight: bold;
+}
+.mocha .hljs-formula {
+  color: #94e2d5;
+}
+.mocha .hljs-link {
+  color: #74c7ec;
+  font-style: italic;
+}
+.mocha .hljs-quote {
+  color: #a6e3a1;
+  font-style: italic;
+}
+.mocha .hljs-selector-tag {
+  color: #f9e2af;
+}
+.mocha .hljs-selector-id {
+  color: #89b4fa;
+}
+.mocha .hljs-selector-class {
+  color: #94e2d5;
+}
+.mocha .hljs-selector-attr {
+  color: #cba6f7;
+}
+.mocha .hljs-selector-pseudo {
+  color: #94e2d5;
+}
+.mocha .hljs-template-tag {
+  color: #f2cdcd;
+}
+.mocha .hljs-template-variable {
+  color: #f2cdcd;
+}
+.mocha .hljs-addition {
+  color: #a6e3a1;
+  background: rgba(166, 227, 161, 0.15);
+}
+.mocha .hljs-deletion {
+  color: #f38ba8;
+  background: rgba(243, 139, 168, 0.15);
+}
+.mocha code {
+  color: #cdd6f4;
+  background: #181825;
+}
+.mocha blockquote blockquote {
+  border-top: 0.1em solid #585b70;
+  border-bottom: 0.1em solid #585b70;
+}
+.mocha hr {
+  border-color: #585b70;
+  border-style: solid;
+}
+.mocha del {
+  color: #9399b2;
+}
+.mocha .ace_gutter {
+  color: #7f849c;
+  background: #181825;
+}
+.mocha .ace_gutter-active-line.ace_gutter-cell {
+  color: #f5c2e7;
+  background: #181825;
+}
+.mocha .tooltiptext {
+  background: #181825;
+  color: #cdd6f4;
+}
+
+.mocha {
+  --bg: #1e1e2e;
+  --fg: #cdd6f4;
+  --sidebar-bg: #181825;
+  --sidebar-fg: #cdd6f4;
+  --sidebar-non-existant: #6c7086;
+  --sidebar-active: #89b4fa;
+  --sidebar-spacer: #6c7086;
+  --scrollbar: #6c7086;
+  --icons: #6c7086;
+  --icons-hover: #7f849c;
+  --links: #89b4fa;
+  --inline-code-color: #fab387;
+  --theme-popup-bg: #181825;
+  --theme-popup-border: #6c7086;
+  --theme-hover: #313244;
+  --quote-bg: #181825;
+  --quote-border: #11111b;
+  --table-border-color: #313244;
+  --table-header-bg: #181825;
+  --table-alternate-bg: #181825;
+  --searchbar-border-color: #313244;
+  --searchbar-bg: #181825;
+  --searchbar-fg: #cdd6f4;
+  --searchbar-shadow-color: #11111b;
+  --searchresults-header-fg: #cdd6f4;
+  --searchresults-border-color: #313244;
+  --searchresults-li-bg: #1e1e2e;
+  --search-mark-bg: #fab387;
+  --warning-border: #fab387;
+  --color-scheme: dark;
+}
