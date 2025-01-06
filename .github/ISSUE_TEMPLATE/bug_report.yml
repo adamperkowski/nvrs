@@ -1,0 +1,44 @@
+name: Report an issue
+description: Report a nvrs issue.
+labels: [ 'bug' ]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Please fill out the sections below to help us diagnose and fix the issue.
+
+  - type: textarea
+    id: bug_summary
+    attributes:
+      label: Bug Summary
+      description: Provide a short summary of the bug.
+      required: true
+
+  - type: textarea
+    id: to_reproduce
+    attributes:
+      label: To Reproduce
+      description: List all steps required to reproduce the bug.
+      required: true
+
+  - type: textarea
+    id: expected_behavior
+    attributes:
+      label: Expected Behavior
+      description: What did you expect to happen?
+      required: true
+
+  - type: textarea
+    id: actual_behavior
+    attributes:
+      label: Actual Behavior
+      description: What actually happened?
+      required: true
+
+  - type: textarea
+    id: additional_information
+    attributes:
+      label: Additional Information
+      description: Add any other context, screenshots, or logs to help us debug the issue.
+    validations:
+      required: false
