@@ -1,44 +1,91 @@
-name: Report an issue
-description: Report a nvrs issue.
-labels: [ 'bug' ]
+name: bug report
+description: report a bug to help us improve
+labels: ['bug']
 body:
   - type: markdown
     attributes:
       value: |
-        Please fill out the sections below to help us diagnose and fix the issue.
+        fill out the sections below to help us diagnose and fix the issue
 
   - type: textarea
-    id: bug_summary
+    id: summary
     attributes:
-      label: Bug Summary
-      description: Provide a short summary of the bug.
+      label: summary
+      description: a clear description of what went wrong
+    validations:
       required: true
 
   - type: textarea
     id: to_reproduce
     attributes:
-      label: To Reproduce
-      description: List all steps required to reproduce the bug.
+      label: to reproduce
+      description: list all steps required to reproduce the behavior
+    validations:
       required: true
 
   - type: textarea
     id: expected_behavior
     attributes:
-      label: Expected Behavior
-      description: What did you expect to happen?
+      label: expected behavior
+      description: what did you expect to happen
+    validations:
       required: true
 
   - type: textarea
     id: actual_behavior
     attributes:
-      label: Actual Behavior
-      description: What actually happened?
+      label: actual behavior
+      description: detailed description of what actually happened
+    validations:
       required: true
 
   - type: textarea
-    id: additional_information
+    id: additional
     attributes:
-      label: Additional Information
-      description: Add any other context, screenshots, or logs to help us debug the issue.
+      label: additional context
+      description: add any other context, screenshots, or logs to help us debug the issue
     validations:
       required: false
+
+  - type: dropdown
+    id: severity
+    attributes:
+      label: severity
+      description: the level of importance
+      options:
+        - label: low
+          value: low
+        - label: medium
+          value: medium
+        - label: high
+          value: high
+        - label: critical
+          value: critical
+    validations:
+      required: true
+
+  - type: dropdown
+    id: os
+    attributes:
+      label: "OS"
+      description: the operating system where the bug occurred
+      multiple: true
+      options:
+        - Linux
+        - MacOS
+        - Windows
+        - Other
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: checklist
+      description: check all that apply
+      options:
+        - 'i have checked the documentation'
+        - 'i have read the Code of Conduct'
+        - 'this is NOT a secutity vulnerability (refer to SECUTITY.md)'
+        - 'there are no known workarounds'
+        - 'there are no already existing issues or pull requests for this bug'
