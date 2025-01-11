@@ -7,6 +7,8 @@ documentation for bleeding-edge main can be found at [https://nvrs.adamperkowski
 
 keep in mind that this website is still a WIP
 
+[see at GitHub](https://github.com/adamperkowski/nvrs)
+
 ## copyright
 ```
 MIT License
