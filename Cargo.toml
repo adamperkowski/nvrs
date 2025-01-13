@@ -41,7 +41,7 @@ required-features = ["nvrs_tui"]
 
 [dependencies]
 clap = { version = "4.5.23", features = ["derive", "color", "error-context", "help", "std", "usage"], default-features = false , optional = true }
-colored = { version = "2.2.0", optional = true }
+colored = { version = "3.0.0", optional = true }
 futures = { version = "0.3.31", optional = true }
 regex = { version = "1.11.1", optional = true }
 reqwest = { version = "0.12.11", features = ["__tls", "charset", "default-tls", "h2", "http2", "json"], default-features = false }
