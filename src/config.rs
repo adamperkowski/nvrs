@@ -240,6 +240,14 @@ pub async fn save(config_content: &Config, path: PathBuf) -> error::Result<()> {
     Ok(())
 }
 
+pub(crate) fn expand_tilde(s: String) -> error::Result<String> {
+    if let Some(stripped) = s.strip_prefix('~') {
+        let home = env::var("HOME")?;
+        return Ok(home + stripped);
+    }
+    Ok(s)
+}
+
 fn is_empty_string(s: &str) -> bool {
     s.is_empty()
 }

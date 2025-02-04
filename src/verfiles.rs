@@ -2,11 +2,10 @@
 //!
 //! see `newver` & `oldver` in [crate::config::ConfigTable]
 
+use crate::{config, error};
 use serde::{Deserialize, Serialize};
 use std::{collections::BTreeMap, path::Path};
 use tokio::{fs, io::AsyncWriteExt};
-
-use crate::{config, error};
 
 // verfiles get created from this
 const TEMPLATE: &str = r#"{
@@ -44,8 +43,8 @@ pub struct Verfile {
 pub async fn load(config_table: &Option<config::ConfigTable>) -> error::Result<(Verfile, Verfile)> {
     let config_table = config_table.to_owned().ok_or(error::Error::NoConfigTable)?;
 
-    let oldver_path = config_table.oldver.ok_or(error::Error::NoXVer)?;
-    let newver_path = config_table.newver.ok_or(error::Error::NoXVer)?;
+    let oldver_path = config::expand_tilde(config_table.oldver.ok_or(error::Error::NoXVer)?)?;
+    let newver_path = config::expand_tilde(config_table.newver.ok_or(error::Error::NoXVer)?)?;
 
     let (oldver, newver) = tokio::try_join!(
         load_file(Path::new(&oldver_path)),
@@ -72,7 +71,7 @@ pub async fn save(
         config_table.newver.ok_or(error::Error::NoXVer)?
     };
 
-    let mut file = fs::File::create(Path::new(&path)).await?;
+    let mut file = fs::File::create(Path::new(&config::expand_tilde(path)?)).await?;
     let content = format!("{}\n", serde_json::to_string_pretty(&verfile)?);
 
     file.write_all(content.as_bytes()).await?;

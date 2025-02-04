@@ -38,6 +38,10 @@ pub enum Error {
     #[error("toml parsing error: {0}")]
     TOMLErrorSer(#[from] toml::ser::Error),
 
+    /// [std::env] errors
+    #[error("env error: {0}")]
+    EnvError(#[from] std::env::VarError),
+
     // custom errors
     /// request status != OK
     #[error("{0}: request status != OK\n{1}")]
