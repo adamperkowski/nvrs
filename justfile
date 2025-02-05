@@ -31,5 +31,5 @@ release ver="": deps test
     git push origin main --follow-tags
 
     CARGO_TARGET_DIR=target \
-    cargo publish \
+    cargo publish && \
     cargo build --bin nvrs --features=nvrs_cli --release
