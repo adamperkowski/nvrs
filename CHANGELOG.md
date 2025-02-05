@@ -2,6 +2,20 @@
 
 All notable changes to nvrs will be documented in this file.
 
+## [0.1.7] - 2025-02-05
+
+### 🚀 Features
+
+- (*verfiles, keyfile*) expand `~` to `$HOME` in paths ([fb0024f](https://github.com/adamperkowski/nvrs/commit/fb0024f8b01eff51ff5b5a90035fdcb1e62340da))
+
+### 📚 Documentation
+
+- add a GitHub repo link to `nvrs.md` ([ae0fb41](https://github.com/adamperkowski/nvrs/commit/ae0fb4106dc35694fb4ce7210a8ae3a8f5bc881c))
+
+### ⚙️ Miscellaneous Tasks
+
+- add a justfile ([3e506aa](https://github.com/adamperkowski/nvrs/commit/3e506aac53be407aaa3ab9c2967687b1573b9891))
+
 ## [0.1.7-pre1] - 2025-01-06
 
 ### 📚 Documentation
