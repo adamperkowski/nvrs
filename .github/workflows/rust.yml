@@ -19,7 +19,7 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  check:
+  test:
     runs-on: ubuntu-latest
 
     steps:
@@ -28,33 +28,7 @@ jobs:
       - name: install Rust
         uses: dtolnay/rust-toolchain@stable
 
-      - name: cargo fmt
-        run: cargo fmt --all --check
+      - name: Install Just
+        uses: extractions/setup-just@v2
 
-      - name: cargo clippy
-        run: |
-          cargo clippy -- -Dwarnings
-          cargo clippy --release -- -Dwarnings
-
-  build:
-    runs-on: ubuntu-latest
-    needs: check
-    
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Build
-        run: |
-          cargo build --verbose
-          cargo build --release --verbose
-
-  test:
-    runs-on: ubuntu-latest
-    needs: build
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Test
-        run: |
-          cargo test --all-features --no-fail-fast
+      - run: just test
