@@ -33,3 +33,11 @@ release ver="": deps test
     CARGO_TARGET_DIR=target \
     cargo publish && \
     cargo build --bin nvrs --features=nvrs_cli --release
+
+    cp target/release/nvrs nvrs
+    cp .github/SECURITY.md SECURITY.md
+    tar -czf "nvrs-v{{ver}}.tar.gz" nvrs CHANGELOG.md CONTRIBUTING.md LICENSE README.md SECURITY.md nvrs.toml keyfile.toml man
+
+clean:
+    cargo clean
+    rm -f nvrs nvrs-v*.tar.gz SECURITY.md
