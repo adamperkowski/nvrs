@@ -8,7 +8,7 @@ use colored::Colorize;
 const RATE_LIMIT: &str = "we might be getting rate-limited here";
 const CONFIG_PATHS: &str = "config file locations:
  ./nvrs.toml
- $NVRS_CONFIG_DIR/nvrs/nvrs.toml
+ $NVRS_CONFIG_DIR/nvrs.toml
  $XDG_CONFIG_HOME/nvrs/nvrs.toml
  $HOME/.config/nvrs.toml";
 const NOT_EMPTY: &str = "make sure the file is not empty";
