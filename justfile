@@ -6,10 +6,7 @@ deps:
     cargo update
 
 run-cli:
-    cargo run --bin nvrs --features=nvrs_cli
-
-run-tui:
-    cargo run --bin nvrs_tui --features=nvrs_tui
+    cargo run --bin nvrs --features=cli
 
 check:
     cargo fmt --all --check
@@ -32,7 +29,7 @@ release ver="": deps test
 
     CARGO_TARGET_DIR=target \
     cargo publish && \
-    cargo build --bin nvrs --features=nvrs_cli --release
+    cargo build --bin nvrs --features=cli --release
 
     cp target/release/nvrs nvrs
     cp .github/SECURITY.md SECURITY.md

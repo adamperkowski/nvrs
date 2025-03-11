@@ -15,12 +15,14 @@ include = [
     "README.md",
     "LICENSE",
     "CHANGELOG.md",
+    "CODE_OF_CONDUCT.md",
+    "CONTRIBUTING.md",
     "rustfmt.toml",
     "man/nvrs.1"
 ]
 
 [features]
-nvrs_cli = ["clap", "colored", "futures"]
+cli = ["clap", "colored", "futures"]
 default = ["aur", "crates-io", "gitea", "github", "gitlab", "regex"]
 aur = []
 crates-io = []
@@ -32,23 +34,18 @@ regex = ["dep:regex"]
 [[bin]]
 name = "nvrs"
 path = "src/cli/main.rs"
-required-features = ["nvrs_cli"]
-
-[[bin]]
-name = "nvrs_tui"
-path = "src/tui/main.rs"
-required-features = ["nvrs_tui"]
+required-features = ["cli"]
 
 [dependencies]
-clap = { version = "4.5.29", features = ["derive", "color", "error-context", "help", "std", "usage"], default-features = false , optional = true }
+clap = { version = "4.5.32", features = ["derive", "color", "error-context", "help", "std", "usage"], default-features = false , optional = true }
 colored = { version = "3.0.0", optional = true }
-futures = { version = "0.3.31", optional = true }
-regex = { version = "1.11.1", optional = true }
-reqwest = { version = "0.12.12", features = ["__tls", "charset", "default-tls", "h2", "http2", "json"], default-features = false }
-serde = { version = "1.0.217", features = ["derive"], default-features = false }
-serde_json = "1.0.138"
-thiserror = "2.0.11"
-tokio = { version = "1.43.0", features = ["full"] }
+futures = { version = "0.3.31", default-features = false, optional = true }
+regex = { version = "1.11.1", features = ["perf", "unicode"], default-features = false, optional = true }
+reqwest = { version = "0.12.12", features = ["default-tls", "json"], default-features = false }
+serde = { version = "1.0.219", features = ["derive"], default-features = false }
+serde_json = { version = "1.0.140", default-features = false }
+thiserror = { version = "2.0.12", default-features = false }
+tokio = { version = "1.44.0", features = ["rt-multi-thread", "fs", "io-std", "macros"], default-features = false }
 toml = { version = "0.8.20", features = ["parse", "display"], default-features = false }
 
 [dev-dependencies]
@@ -58,15 +55,7 @@ nvrs = { path = "." }
 
 [profile.release]
 lto = "fat"
-codegen-units = 1
+codegen-units = 2
 panic = "abort"
 strip = true
 opt-level = "z"
-
-[profile.bench]
-opt-level = 3
-debug = false
-
-[[bench]]
-name = "nvrs_bench"
-harness = false
