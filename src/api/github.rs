@@ -1,6 +1,6 @@
 use reqwest::{
-    header::{HeaderValue, ACCEPT, AUTHORIZATION},
     Response,
+    header::{ACCEPT, AUTHORIZATION, HeaderValue},
 };
 use serde_json::Value;
 

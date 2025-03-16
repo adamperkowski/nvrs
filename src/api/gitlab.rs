@@ -1,5 +1,5 @@
 use crate::{api, error};
-use reqwest::{header::HeaderValue, Response};
+use reqwest::{Response, header::HeaderValue};
 use serde_json::Value;
 
 #[derive(serde::Deserialize)]

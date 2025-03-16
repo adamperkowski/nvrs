@@ -1,5 +1,5 @@
 use crate::{api, error};
-use reqwest::{header::HeaderValue, Response};
+use reqwest::{Response, header::HeaderValue};
 
 #[derive(serde::Deserialize)]
 #[serde(transparent)]

@@ -264,19 +264,23 @@ mod tests {
 
     #[tokio::test]
     async fn manual_package() {
-        assert!(Package::new(
-            "non_existing_source".to_string(),
-            "non_existing".to_string(),
-            false,
-            String::new()
-        )
-        .is_err());
-        assert!(Package::new(
-            "github".to_string(),
-            "orhun/git-cliff".to_string(),
-            false,
-            "v".to_string()
-        )
-        .is_ok());
+        assert!(
+            Package::new(
+                "non_existing_source".to_string(),
+                "non_existing".to_string(),
+                false,
+                String::new()
+            )
+            .is_err()
+        );
+        assert!(
+            Package::new(
+                "github".to_string(),
+                "orhun/git-cliff".to_string(),
+                false,
+                "v".to_string()
+            )
+            .is_ok()
+        );
     }
 }
