@@ -58,7 +58,7 @@ commit_parsers = [
   { message = "^chore\\(deps.*\\)", skip = true },
   { message = "^chore\\(pr\\)", skip = true },
   { message = "changelog", skip = true },
-  { message = "^chore", group = "<!-- 7 -->⚙️ Miscellaneous Tasks" },
+  { message = "^chore", group = "<!-- 7 -->⚙️ Miscellaneous" },
   { body = ".*security", group = "<!-- 8 -->🛡️ Security" },
   { message = "^revert", group = "<!-- 9 -->◀️ Revert" },
   { body = ".*", group = "Other (unconventional)" },
