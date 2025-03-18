@@ -2,6 +2,18 @@
 
 All notable changes to nvrs will be documented in this file.
 
+## [0.1.8-pre1] - 2025-03-18
+
+### 🛠️ Refactoring
+
+- (*config*) support XDG standard ([22c6424](https://github.com/adamperkowski/nvrs/commit/22c64243c571914ece818b86523e337e416ff669))
+- (*justfile*) release structure ([4bab7d5](https://github.com/adamperkowski/nvrs/commit/4bab7d502453d45461ad051d35d3635935695465))
+- [**breaking**] rust 2024 ([79d62d2](https://github.com/adamperkowski/nvrs/commit/79d62d2198e447d4706ac50d76c26ad3553a4c9a))
+
+### ⚡ Performance
+
+- some optimizations ([#44](https://github.com/adamperkowski/nvrs/issues/44)) ([6d423d5](https://github.com/adamperkowski/nvrs/commit/6d423d5eeb52806978d971891c4c955b2140f85e))
+
 ## [0.1.7] - 2025-02-05
 
 ### 🚀 Features
