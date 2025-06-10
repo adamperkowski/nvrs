@@ -73,6 +73,10 @@ pub struct Package {
     #[cfg(feature = "regex")]
     #[serde(default)]
     regex: String,
+    #[cfg(feature = "shell")]
+    #[serde(default)]
+    #[serde(skip_serializing_if = "is_empty_string")]
+    shell: String,
 
     /// whether to use the latest tag instead of the latest release
     #[serde(default)]
@@ -124,6 +128,11 @@ impl Package {
                 package.url = target;
                 Ok(())
             }
+            #[cfg(feature = "shell")]
+            "shell" => {
+                package.shell = target;
+                Ok(())
+            }
             _ => Err(error::Error::SourceNotFound(source.clone())),
         }?;
 
@@ -152,6 +161,8 @@ impl Package {
             url: String::new(),
             #[cfg(feature = "regex")]
             regex: String::new(),
+            #[cfg(feature = "shell")]
+            shell: String::new(),
             use_max_tag: None,
             prefix: String::new(),
         }
@@ -185,6 +196,8 @@ impl Package {
             "gitlab" => vec![self_ref.gitlab, self_ref.host],
             #[cfg(feature = "regex")]
             "regex" => vec![self_ref.url, self_ref.regex],
+            #[cfg(feature = "shell")]
+            "shell" => vec![self_ref.shell],
             _ => vec![],
         };
 

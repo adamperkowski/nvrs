@@ -91,6 +91,10 @@ pub enum Error {
     /// source / API not found
     #[error("source {0} not found")]
     SourceNotFound(String),
+
+    /// shell command failed
+    #[error("shell command failed: {0}")]
+    ShellCommandFailed(String),
 }
 
 impl Error {

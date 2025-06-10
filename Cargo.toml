@@ -23,13 +23,14 @@ include = [
 
 [features]
 cli = ["clap", "colored", "futures"]
-default = ["aur", "crates-io", "gitea", "github", "gitlab", "regex"]
+default = ["aur", "crates-io", "gitea", "github", "gitlab", "regex", "shell"]
 aur = []
 crates-io = []
 gitea = []
 github = []
 gitlab = []
 regex = ["dep:regex"]
+shell = []
 
 [[bin]]
 name = "nvrs"

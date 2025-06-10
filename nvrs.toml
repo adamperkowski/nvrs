@@ -47,3 +47,7 @@ source = "gitea"
 host = "codeberg.org"
 gitea = "maandree/libkeccak"
 use_max_tag = true
+
+[kernel]
+source = "shell"
+shell = "uname -r | cut -d'-' -f1"
