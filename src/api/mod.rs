@@ -12,6 +12,8 @@ mod github;
 mod gitlab;
 #[cfg(feature = "regex")]
 mod regex;
+#[cfg(feature = "shell")]
+mod shell;
 
 /// struct containing the API name & a pointer to API's `get_latest` function
 pub struct Api {
@@ -98,6 +100,11 @@ pub const API_LIST: &[Api] = &[
     Api {
         name: "regex",
         func: regex::get_latest,
+    },
+    #[cfg(feature = "shell")]
+    Api {
+        name: "shell",
+        func: shell::get,
     },
 ];
 

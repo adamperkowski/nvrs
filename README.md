@@ -31,6 +31,7 @@ check the [release notes](https://github.com/adamperkowski/nvrs/releases) and [c
 - `github`
 - `gitlab` (with custom hosts)
 - `website` (regex)
+- `shell`
 
 ### QOL improvements
 - `ALL` argument for the `--take` command
