@@ -1,6 +1,6 @@
 [package]
 name = "nvrs"
-version = "0.1.8-pre1"
+version = "0.1.8"
 authors = ["Adam Perkowski <adas1per@protonmail.com>"]
 license = "MIT"
 description = "🚦 fast new version checker for software releases 🦀"
@@ -38,11 +38,11 @@ path = "src/cli/main.rs"
 required-features = ["cli"]
 
 [dependencies]
-clap = { version = "4.5.39", features = ["derive", "color", "error-context", "help", "std", "usage"], default-features = false , optional = true }
+clap = { version = "4.5.40", features = ["derive", "color", "error-context", "help", "std", "usage"], default-features = false , optional = true }
 colored = { version = "3.0.0", optional = true }
 futures = { version = "0.3.31", default-features = false, optional = true }
 regex = { version = "1.11.1", features = ["perf", "unicode"], default-features = false, optional = true }
-reqwest = { version = "0.12.19", features = ["default-tls", "json"], default-features = false }
+reqwest = { version = "0.12.20", features = ["default-tls", "json"], default-features = false }
 serde = { version = "1.0.219", features = ["derive"], default-features = false }
 serde_json = { version = "1.0.140", default-features = false }
 thiserror = { version = "2.0.12", default-features = false }

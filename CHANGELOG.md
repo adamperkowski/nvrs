@@ -2,6 +2,16 @@
 
 All notable changes to nvrs will be documented in this file.
 
+## [0.1.8] - 2025-06-14
+
+### 🚀 Features
+
+- (*sources*) add shell ([#70](https://github.com/adamperkowski/nvrs/issues/70)) ([7b03830](https://github.com/adamperkowski/nvrs/commit/7b03830ab4e49ebb53381277abae0b575d0744fe))
+
+### ⚙️ Miscellaneous
+
+- formatting, editorconfig & housekeeping ([84aab7a](https://github.com/adamperkowski/nvrs/commit/84aab7aa7d34639f374007504490da591bd10687))
+
 ## [0.1.8-pre1] - 2025-03-18
 
 ### 🛠️ Refactoring
@@ -24,7 +34,7 @@ All notable changes to nvrs will be documented in this file.
 
 - add a GitHub repo link to `nvrs.md` ([ae0fb41](https://github.com/adamperkowski/nvrs/commit/ae0fb4106dc35694fb4ce7210a8ae3a8f5bc881c))
 
-### ⚙️ Miscellaneous Tasks
+### ⚙️ Miscellaneous
 
 - add a justfile ([3e506aa](https://github.com/adamperkowski/nvrs/commit/3e506aac53be407aaa3ab9c2967687b1573b9891))
 
@@ -36,7 +46,7 @@ All notable changes to nvrs will be documented in this file.
 - (*issue_template*) add templates ([e603590](https://github.com/adamperkowski/nvrs/commit/e603590cf97aeabef9933b762e239a54ab72f40e))
 - (*mdbook*) we're up ([#29](https://github.com/adamperkowski/nvrs/issues/29)) ([154792d](https://github.com/adamperkowski/nvrs/commit/154792d75e76beb636af1807ec1e8114a8c4af64))
 
-### ⚙️ Miscellaneous Tasks
+### ⚙️ Miscellaneous
 
 - improve secret security by using `pub(crate)` ([9baee92](https://github.com/adamperkowski/nvrs/commit/9baee9208c72c9544f68140b421ca3a28f0ec510))
 
@@ -69,7 +79,7 @@ All notable changes to nvrs will be documented in this file.
 
 - reduce cloning & improve overall performance ([0777ef2](https://github.com/adamperkowski/nvrs/commit/0777ef24b54f056d7bd66c8b932b478cbbc3eb66))
 
-### ⚙️ Miscellaneous Tasks
+### ⚙️ Miscellaneous
 
 - (*repo*) fix dependabot ([432b10f](https://github.com/adamperkowski/nvrs/commit/432b10f32199ecd7a33c2d9643a5e1f512db862c))
 - (*ci*) remove `cliff.yml` ([f57c3ab](https://github.com/adamperkowski/nvrs/commit/f57c3ab39fc9a3db68cbd26fc7ac6a93b1c89c20))
@@ -150,7 +160,7 @@ All notable changes to nvrs will be documented in this file.
 
 - I. AM. SPEED. ([6933f8c](https://github.com/adamperkowski/nvrs/commit/6933f8ccafa0ae4f195e65921541e5eeb12b05fb))
 
-### ⚙️ Miscellaneous Tasks
+### ⚙️ Miscellaneous
 
 - fix invalid `is_empty_string` type ([1e8ae8f](https://github.com/adamperkowski/nvrs/commit/1e8ae8f44c24a1a70c7424c979ab4b654000f29c))
 
@@ -172,7 +182,7 @@ All notable changes to nvrs will be documented in this file.
 
 - (*readme*) add `sources` ([0823f46](https://github.com/adamperkowski/nvrs/commit/0823f46aea5e19f31605360849bfeec2389c51af))
 
-### ⚙️ Miscellaneous Tasks
+### ⚙️ Miscellaneous
 
 - more `cargo` metadata ([6b6ebd6](https://github.com/adamperkowski/nvrs/commit/6b6ebd680f49d22c053360f7b542ba074e3eb2b1))
 - (*main.rs*) collapse the `latest` `else if` statement ([3cdb71d](https://github.com/adamperkowski/nvrs/commit/3cdb71dc8e1759eb6a3309d5fe45dfe95663fc02))
@@ -215,7 +225,7 @@ All notable changes to nvrs will be documented in this file.
 
 - (*custom_error*) improve newline control ([#1](https://github.com/adamperkowski/nvrs/issues/1)) ([05faaca](https://github.com/adamperkowski/nvrs/commit/05faaca79dd1306a818864ab80ae028a0217dd1e))
 
-### ⚙️ Miscellaneous Tasks
+### ⚙️ Miscellaneous
 
 - GitHub stuff ([eda40d8](https://github.com/adamperkowski/nvrs/commit/eda40d8d68c4c13d24ad2b9b0acd217c02ee889e))
 - run git-cliff on schedule ([c18f152](https://github.com/adamperkowski/nvrs/commit/c18f15256d041c17f1a47e6310c08ce23fc286f2))
