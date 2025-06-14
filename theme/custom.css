@@ -1,70 +1,70 @@
 /* Globals */
 
 :root {
-    --sidebar-width: 300px;
-    --sidebar-resize-indicator-width: 8px;
-    --sidebar-resize-indicator-space: 2px;
-    --page-padding: 15px;
-    --content-max-width: 750px;
-    --menu-bar-height: 50px;
-    --mono-font: "Source Code Pro", Consolas, "Ubuntu Mono", Menlo, "DejaVu Sans Mono", monospace, monospace;
-    --code-font-size: 0.875em /* please adjust the ace font size accordingly in editor.js */
+  --sidebar-width: 300px;
+  --sidebar-resize-indicator-width: 8px;
+  --sidebar-resize-indicator-space: 2px;
+  --page-padding: 15px;
+  --content-max-width: 750px;
+  --menu-bar-height: 50px;
+  --mono-font: "Source Code Pro", Consolas, "Ubuntu Mono", Menlo, "DejaVu Sans Mono", monospace, monospace;
+  --code-font-size: 0.875em /* please adjust the ace font size accordingly in editor.js */
 }
 
 ::selection {
-    background: #6E1D57;
-    color: #00050D;
+  background: #6E1D57;
+  color: #00050D;
 }
 
 /* Themes */
 
 .nvrs {
-    --bg: #00050D;
-    --fg: #A3A3A3;
+  --bg: #00050D;
+  --fg: #A3A3A3;
 
-    --sidebar-bg: #000D19;
-    --sidebar-fg: #A3A3A3;
-    --sidebar-non-existant: #A3A3A3;
-    --sidebar-active: #A01576;
-    --sidebar-spacer: #00050D;
+  --sidebar-bg: #000D19;
+  --sidebar-fg: #A3A3A3;
+  --sidebar-non-existant: #A3A3A3;
+  --sidebar-active: #A01576;
+  --sidebar-spacer: #00050D;
 
-    --scrollbar: var(--sidebar-fg);
+  --scrollbar: var(--sidebar-fg);
 
-    --icons: #A3A3A3;
-    --icons-hover: #A3A3A3;
+  --icons: #A3A3A3;
+  --icons-hover: #A3A3A3;
 
-    --links: #1A76A8;
+  --links: #1A76A8;
 
-    --inline-code-color: #A3A3A3;
+  --inline-code-color: #A3A3A3;
 
-    --theme-popup-bg: #000D19;
-    --theme-popup-border: #0C567E;
-    --theme-hover: #6E1D57;
+  --theme-popup-bg: #000D19;
+  --theme-popup-border: #0C567E;
+  --theme-hover: #6E1D57;
 
-    --quote-bg: #000D19;
-    --quote-border: #0C567E;
+  --quote-bg: #000D19;
+  --quote-border: #0C567E;
 
-    --warning-border: #7D0C0C;
+  --warning-border: #7D0C0C;
 
-    --table-border-color: #000D19;
-    --table-header-bg: #00050D;
-    --table-alternate-bg: #000D19;
+  --table-border-color: #000D19;
+  --table-header-bg: #00050D;
+  --table-alternate-bg: #000D19;
 
-    --searchbar-border-color: #0C567E;
-    --searchbar-bg: #000D19;
-    --searchbar-fg: #A3A3A3;
-    --searchbar-shadow-color: #aaa;
-    --searchresults-header-fg: #666;
-    --searchresults-border-color: #98a3ad;
-    --searchresults-li-bg: #2b2b2f;
-    --search-mark-bg: #0C567E;
+  --searchbar-border-color: #0C567E;
+  --searchbar-bg: #000D19;
+  --searchbar-fg: #A3A3A3;
+  --searchbar-shadow-color: #aaa;
+  --searchresults-header-fg: #666;
+  --searchresults-border-color: #98a3ad;
+  --searchresults-li-bg: #2b2b2f;
+  --search-mark-bg: #0C567E;
 
-    --color-scheme: dark;
+  --color-scheme: dark;
 
-    /* Same as `--icons` */
-    --copy-button-filter: invert(26%) sepia(8%) saturate(575%) hue-rotate(169deg) brightness(87%) contrast(82%);
-    /* Same as `--sidebar-active` */
-    --copy-button-filter-hover: invert(36%) sepia(70%) saturate(503%) hue-rotate(167deg) brightness(98%) contrast(89%);
+  /* Same as `--icons` */
+  --copy-button-filter: invert(26%) sepia(8%) saturate(575%) hue-rotate(169deg) brightness(87%) contrast(82%);
+  /* Same as `--sidebar-active` */
+  --copy-button-filter-hover: invert(36%) sepia(70%) saturate(503%) hue-rotate(167deg) brightness(98%) contrast(89%);
 }
 
 /* https://highlightjs.readthedocs.io/en/latest/css-classes-reference.html */
