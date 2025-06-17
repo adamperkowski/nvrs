@@ -216,9 +216,15 @@ pub async fn load(custom_path: &Option<String>) -> error::Result<(Config, PathBu
         }
     } else {
         let default_path = Path::new("nvrs.toml");
+        let config_env_nvrs = match env::var("NVRS_CONFIG_DIR") {
+            Ok(s) => Ok(expand_tilde(s)?),
+            Err(e) => Err(e),
+        };
         let config_home = format!(
-            "{}/nvrs/nvrs.toml",
-            env::var("XDG_CONFIG_HOME").unwrap_or(expand_tilde("~/.config".to_string())?)
+            "{}/nvrs.toml",
+            config_env_nvrs
+                .or_else(|_| env::var("XDG_CONFIG_HOME").map(|v| format!("{}/nvrs", v)))
+                .unwrap_or(expand_tilde("~/.config/nvrs".to_string())?)
         );
         let config_home_non_xdg = expand_tilde("~/.config/nvrs.toml".to_string())?;
         let config_home_non_xdg = Path::new(&config_home_non_xdg);
