@@ -84,7 +84,7 @@ body:
           required: true
         - label: 'i have read the Code of Conduct'
           required: true
-        - label: 'this is NOT a secutity vulnerability (refer to SECUTITY.md)'
+        - label: 'this is NOT a security vulnerability (refer to https://github.com/adamperkowski/nvrs/security/policy)'
           required: true
         - label: 'there are no known workarounds'
           required: false
