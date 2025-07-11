@@ -67,10 +67,7 @@ pub fn get_args() -> Cli {
                 .as_secs()
                 / (365 * 24 * 60 * 60));
 
-        println!(
-            "Copyright (c) {} Adam Perkowski\n{}",
-            current_year, COPYRIGHT_TEXT
-        );
+        println!("Copyright (c) {current_year} Adam Perkowski\n{COPYRIGHT_TEXT}");
 
         std::process::exit(0);
     } else if cli.list_sources {

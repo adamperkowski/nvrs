@@ -18,7 +18,7 @@ pub fn get_latest(args: api::ApiArgs) -> api::ReleaseFuture {
         let repo_url = format!("https://api.github.com/repos/{}", args.args[0]);
 
         if args.use_max_tag.is_some_and(|x| x) {
-            let url = format!("{}/tags", repo_url);
+            let url = format!("{repo_url}/tags");
             let result = request(url, &args).await?;
             let json: Value = result.json().await?;
 
@@ -39,7 +39,7 @@ pub fn get_latest(args: api::ApiArgs) -> api::ReleaseFuture {
                 ),
             })
         } else {
-            let url = format!("{}/releases/latest", repo_url);
+            let url = format!("{repo_url}/releases/latest");
             let result = request(url, &args).await?;
             let json: GitHubResponse = result.json().await?;
 

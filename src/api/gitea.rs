@@ -35,7 +35,7 @@ pub fn get_latest(args: api::ApiArgs) -> api::ReleaseFuture {
         let repo_url = format!("https://{}/api/v1/repos/{}", host, args.args[0]);
 
         if args.use_max_tag.is_some_and(|x| x) {
-            let url = format!("{}/tags", repo_url);
+            let url = format!("{repo_url}/tags");
 
             let result = request(url, &args).await?;
             let json: &GiteaTag = &result.json::<GiteaTagResponse>().await?.tags[0];
@@ -46,7 +46,7 @@ pub fn get_latest(args: api::ApiArgs) -> api::ReleaseFuture {
                 url: format!("{}/releases/tag/{}", repo_url, json.name),
             })
         } else {
-            let url = format!("{}/releases", repo_url);
+            let url = format!("{repo_url}/releases");
             let result = request(url, &args).await?;
             let json: &GiteaRelease = &result.json::<GiteaReleaseResponse>().await?.releases[0];
 

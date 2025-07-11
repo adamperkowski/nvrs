@@ -163,7 +163,7 @@ async fn sync(core: Core, no_fail: bool) -> error::Result<()> {
             Ok(release) => {
                 let gitref: String;
                 let tag = if let Some(t) = release.tag.clone() {
-                    gitref = format!("refs/tags/{}", t);
+                    gitref = format!("refs/tags/{t}");
                     release.tag.unwrap().replacen(&package.1.prefix, "", 1)
                 } else {
                     gitref = String::new();

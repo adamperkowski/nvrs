@@ -23,7 +23,7 @@ pub fn get_latest(args: api::ApiArgs) -> api::ReleaseFuture {
         );
 
         if args.use_max_tag.is_some_and(|x| x) {
-            let url = format!("{}/repository/tags", repo_url);
+            let url = format!("{repo_url}/repository/tags");
             let result = request(url, &args).await?;
             let json: Value = result.json().await?;
 
@@ -41,7 +41,7 @@ pub fn get_latest(args: api::ApiArgs) -> api::ReleaseFuture {
                 url: format!("https://{}/{}/-/tags/{}", host, args.args[0], max_tag),
             })
         } else {
-            let url = format!("{}/releases/permalink/latest", repo_url);
+            let url = format!("{repo_url}/releases/permalink/latest");
             let result = request(url, &args).await?;
             let json: GitLabResponse = result.json().await?;
 
