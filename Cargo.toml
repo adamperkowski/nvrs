@@ -51,7 +51,7 @@ toml = { version = "0.8.23", features = ["parse", "display"], default-features =
 
 [dev-dependencies]
 tokio-test = "0.4.4"
-criterion = { version = "0.6.0", features = ["html_reports"] }
+criterion = { version = "0.7.0", features = ["html_reports"] }
 nvrs = { path = "." }
 
 [profile.release]
