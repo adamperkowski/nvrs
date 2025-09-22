@@ -38,7 +38,7 @@ path = "src/cli/main.rs"
 required-features = ["cli"]
 
 [dependencies]
-clap = { version = "4.5.46", features = ["derive", "color", "error-context", "help", "std", "usage"], default-features = false , optional = true }
+clap = { version = "4.5.48", features = ["derive", "color", "error-context", "help", "std", "usage"], default-features = false , optional = true }
 colored = { version = "3.0.0", optional = true }
 futures = { version = "0.3.31", default-features = false, optional = true }
 regex = { version = "1.11.2", features = ["perf", "unicode"], default-features = false, optional = true }
