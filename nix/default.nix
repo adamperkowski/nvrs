@@ -6,21 +6,24 @@
 }:
 
 let
-  p = (lib.importTOML ./Cargo.toml).package;
+  p = (lib.importTOML ../Cargo.toml).package;
 in
 rustPlatform.buildRustPackage {
   pname = p.name;
   inherit (p) version;
 
-  src = ./.;
+  src = ../.;
 
-  cargoLock.lockFile = ./Cargo.lock;
+  cargoLock.lockFile = ../Cargo.lock;
 
   nativeBuildInputs = [ pkg-config ];
   buildInputs = [ openssl ];
 
   buildFeatures = [ "cli" ];
-  cargoBuildFlags = [ "--bin" "nvrs" ];
+  cargoBuildFlags = [
+    "--bin"
+    "nvrs"
+  ];
 
   # Skip tests that rely on network access.
   # We're also not running cli tokio tests because they don't implement skipping functionality.

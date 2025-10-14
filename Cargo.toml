@@ -5,6 +5,7 @@ authors = ["Adam Perkowski <adas1per@protonmail.com>"]
 license = "MIT"
 description = "🚦 fast new version checker for software releases 🦀"
 repository = "https://github.com/adamperkowski/nvrs"
+homepage = "https://nvrs.adamperkowski.dev"
 readme = "README.md"
 categories = ["command-line-interface", "command-line-utilities"]
 edition = "2024"

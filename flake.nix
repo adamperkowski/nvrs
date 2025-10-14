@@ -18,11 +18,17 @@
     {
       packages = forAllSystems (pkgs: rec {
         default = nvrs;
-        nvrs = pkgs.callPackage ./default.nix { };
+        nvrs = pkgs.callPackage ./nix/default.nix { };
       });
 
+      overlays.default = final: _: {
+        nvrs = final.callPackage ./nix/default.nix { };
+      };
+
+      homeManagerModules.default = ./nix/hm-module.nix;
+
       devShells = forAllSystems (pkgs: rec {
-        default = pkgs.callPackage ./shell.nix { inherit pkgs; };
+        default = pkgs.callPackage ./nix/shell.nix { inherit pkgs; };
       });
 
       formatter = forAllSystems (pkgs: pkgs.nixfmt-tree);
