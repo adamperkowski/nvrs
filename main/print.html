@@ -209,12 +209,64 @@ cd nvrs
 makepkg -si
 </code></pre>
 <h2 id="nix"><a class="header" href="#nix">Nix</a></h2>
+<h3 id="flakes"><a class="header" href="#flakes">Flakes</a></h3>
 <p>There is a <a href="https://github.com/adamperkowski/nvrs/blob/main/flake.nix">flake</a> available. <br>
 You can run it directly with:</p>
 <pre><code class="language-bash">nix run github:adamperkowski/nvrs
 </code></pre>
-<p>or install it by adding the following to your flake inputs:</p>
-<pre><code class="language-nix">inputs.nvrs.url = "github:adamperkowski/nvrs";
+<p>or install it by adding the following to your <code>flake.nix</code>:</p>
+<pre><code class="language-nix">{
+  inputs = {
+    nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
+    nvrs.url = "github:adamperkowski/nvrs";
+  };
+
+  outputs = { self, nixpkgs, nvrs }: {
+    nixosConfigurations.example = nixpkgs.lib.nixosSystem {
+      system = "x86_64-linux";
+      modules = [{
+        environment.systemPackages = [
+          inputs.nvrs.packages.${pkgs.system}.default
+        ];
+      }];
+    };
+  };
+}
+</code></pre>
+<h3 id="home-manager"><a class="header" href="#home-manager">Home Manager</a></h3>
+<p>Nvrs also provides a <a href="https://nix-community.github.io/home-manager">Home Manager</a> module. <br>
+You can use it in your <code>home.nix</code> like this:</p>
+<pre><code class="language-nix">{
+  inputs = {
+    nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
+    home-manager = {
+      url = "github:nix-community/home-manager";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    nvrs.url = "github:adamperkowski/nvrs";
+  };
+
+  outputs = { self, nixpkgs, home-manager, nvrs }: {
+    homeConfigurations."user@hostname" = home-manager.lib.homeManagerConfiguration {
+      modules = [
+        home-manager.homeManagerModules.default
+        nvrs.homeManagerModules.default
+        {
+          programs.nvrs = {
+            enable = true;
+            settings = {
+              julec = {
+                source = "github";
+                github = "julelang/julec";
+                prefix = "jule";
+              };
+            };
+          };
+        }
+      ];
+    };
+  };
+}
 </code></pre>
 <h2 id="cargo"><a class="header" href="#cargo">Cargo</a></h2>
 <p><a href="https://crates.io/crates/nvrs">nvrs</a> can be installed via <a href="https://doc.rust-lang.org/cargo">Cargo</a> with:</p>
