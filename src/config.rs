@@ -224,12 +224,16 @@ pub async fn load(custom_path: &Option<String>) -> error::Result<(Config, PathBu
         let config_home_non_xdg = Path::new(&config_home_non_xdg);
         let home_path = Path::new(&config_home);
 
+        let global_path = Path::new("/etc/nvrs/nvrs.toml");
+
         if default_path.exists() && default_path.is_file() {
             default_path.to_path_buf()
         } else if home_path.exists() && home_path.is_file() {
             home_path.to_path_buf()
         } else if config_home_non_xdg.exists() && config_home_non_xdg.is_file() {
             config_home_non_xdg.to_path_buf()
+        } else if global_path.exists() && global_path.is_file() {
+            global_path.to_path_buf()
         } else {
             return Err(error::Error::NoConfig);
         }

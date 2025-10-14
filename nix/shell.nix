@@ -11,6 +11,7 @@ let
       rustfmt
       rust-analyzer
       git-cliff
+      just
     ]
     ++ (mainPkg.nativeBuildInputs or [ ])
     ++ (mainPkg.buildInputs or [ ]);
