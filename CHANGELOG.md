@@ -2,6 +2,19 @@
 
 All notable changes to nvrs will be documented in this file.
 
+## [0.1.9] - 2025-10-14
+
+### 🚀 Features
+
+- (*nix*) create a flake ([c7b2716](https://github.com/adamperkowski/nvrs/commit/c7b27160d858d74767622556a064674b2c712369))
+- (*nix*) create a home manager module ([7d6f66a](https://github.com/adamperkowski/nvrs/commit/7d6f66a844a233fbd5b605558e3b960353564ab7))
+- (*config*) global `etc` config path ([5aec50e](https://github.com/adamperkowski/nvrs/commit/5aec50ec42a15d357c77d9149cf4a69a7ff86f62))
+
+### ⚙️ Miscellaneous
+
+- fix typo, secutity -> security ([#71](https://github.com/adamperkowski/nvrs/issues/71)) ([4335ce0](https://github.com/adamperkowski/nvrs/commit/4335ce0a854e36e7d32a1a550e945617cd0cc485))
+- (*clippy*) comply with `uninlined_format_args` ([98dd72d](https://github.com/adamperkowski/nvrs/commit/98dd72dba3664af2debf8ea5a446368e23194495))
+
 ## [0.1.8] - 2025-06-14
 
 ### 🚀 Features
