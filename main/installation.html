@@ -168,6 +168,14 @@ you can install it with your preferred <a href="https://wiki.archlinux.org/title
 cd nvrs
 makepkg -si
 </code></pre>
+<h2 id="nix"><a class="header" href="#nix">Nix</a></h2>
+<p>There is a <a href="https://github.com/adamperkowski/nvrs/blob/main/flake.nix">flake</a> available. <br>
+You can run it directly with:</p>
+<pre><code class="language-bash">nix run github:adamperkowski/nvrs
+</code></pre>
+<p>or install it by adding the following to your flake inputs:</p>
+<pre><code class="language-nix">inputs.nvrs.url = "github:adamperkowski/nvrs";
+</code></pre>
 <h2 id="cargo"><a class="header" href="#cargo">Cargo</a></h2>
 <p><a href="https://crates.io/crates/nvrs">nvrs</a> can be installed via <a href="https://doc.rust-lang.org/cargo">Cargo</a> with:</p>
 <pre><code class="language-sh">cargo install nvrs --all-features
