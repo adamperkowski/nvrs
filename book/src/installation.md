@@ -17,6 +17,21 @@ cd nvrs
 makepkg -si
 ```
 
+## Nix
+
+There is a [flake](https://github.com/adamperkowski/nvrs/blob/main/flake.nix) available. <br>
+You can run it directly with:
+
+```bash
+nix run github:adamperkowski/nvrs
+```
+
+or install it by adding the following to your flake inputs:
+
+```nix
+inputs.nvrs.url = "github:adamperkowski/nvrs";
+```
+
 ## Cargo
 [nvrs](https://crates.io/crates/nvrs) can be installed via [Cargo](https://doc.rust-lang.org/cargo) with:
 

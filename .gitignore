@@ -1,4 +1,5 @@
 /target
+/result
 newver.json
 oldver.json
 keyfile.toml
