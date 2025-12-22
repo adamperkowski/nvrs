@@ -48,7 +48,7 @@ serde = { version = "1.0.228", features = ["derive"], default-features = false }
 serde_json = { version = "1.0.145", default-features = false }
 thiserror = { version = "2.0.17", default-features = false }
 tokio = { version = "1.48.0", features = ["rt-multi-thread", "fs", "io-std", "macros"], default-features = false }
-toml = { version = "0.9.8", features = ["parse", "display", "serde"], default-features = false }
+toml = { version = "0.9.10", features = ["parse", "display", "serde"], default-features = false }
 
 [dev-dependencies]
 tokio-test = "0.4.4"
